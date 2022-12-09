@@ -1,7 +1,6 @@
-package Task;
+package task;
 
-public class Task{
-    private static int globalCount = 0;
+public class Task {
     protected int id;
     protected String status;
     protected String name;
@@ -11,11 +10,10 @@ public class Task{
     public static final String statusInProgress = "IN_PROGRESS";
     public static final String statusDone = "DONE";
 
-    public Task(String name, String description){
+    public Task(String name, String description) {
         this.name = name;
         this.description = description;
         status = statusNew;
-        id = generateId();
     }
 
     @Override
@@ -30,6 +28,10 @@ public class Task{
 
     public int getId() {
         return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 
     public String getName() {
@@ -52,12 +54,8 @@ public class Task{
         this.description = description;
     }
 
-    protected int generateId(){
-        return ++globalCount;
-    }
-
-    public void updateStatus(String status){
-        if (!(status.equals(statusNew) || status.equals(statusInProgress) || status.equals(statusDone))){
+    public void setStatus(String status) {
+        if (!(status.equals(statusNew) || status.equals(statusInProgress) || status.equals(statusDone))) {
             System.out.println("Unrecognizable status, use other value");
             return;
         }

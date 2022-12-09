@@ -1,11 +1,10 @@
-package Task;
+package task;
 
-public class SubTask extends Task{
-    private Epic parentEpic;
+public class SubTask extends Task {
+    private Integer parentEpic;
 
-    public SubTask(String name, String description, Epic parentEpic){
+    public SubTask(String name, String description) {
         super(name, description);
-        this.parentEpic = parentEpic;
     }
 
     @Override
@@ -14,7 +13,7 @@ public class SubTask extends Task{
         if (parentEpic == null)
             parentEpicId = "null";
         else
-            parentEpicId = String.valueOf(parentEpic.getId());
+            parentEpicId = String.valueOf(parentEpic);
         return "SubTask{" +
                 "parentEpicId=" + parentEpicId +
                 ", id=" + id +
@@ -29,33 +28,27 @@ public class SubTask extends Task{
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         SubTask subTask = (SubTask) o;
-        return id == subTask.id && parentEpic.id == subTask.parentEpic.id;
+        return id == subTask.id && parentEpic == subTask.parentEpic;
     }
 
     @Override
-    public void updateStatus(String status){
-        if (!(status.equals(statusNew) || status.equals(statusInProgress) || status.equals(statusDone))){
+    public void setStatus(String status) {
+        if (!(status.equals(statusNew) || status.equals(statusInProgress) || status.equals(statusDone))) {
             System.out.println("Unrecognizable status, use other value");
             return;
         }
         this.status = status;
-        parentEpic.updateStatus();
     }
 
-    public void linkToEpic(Epic epic){
-        if(parentEpic != null && !epic.equals(parentEpic))
-            parentEpic.removeSubtask(this);
-        if(epic != null) {
-            epic.updateStatus();
-        }
+    public void linkToEpic(int epic) {
         parentEpic = epic;
     }
 
-    public Epic getParentEpic(){
+    public Integer getParentEpic() {
         return parentEpic;
     }
 
-    public void removeParentEpic(){
+    public void removeParentEpic() {
         parentEpic = null;
     }
 }

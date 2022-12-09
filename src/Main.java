@@ -1,33 +1,50 @@
-import Manager.TaskManager;
-import Task.*;
+import manager.TaskManager;
+import task.*;
 
 public class Main {
 
     public static void main(String[] args) {
-        TaskManager taskManager = new TaskManager();
+        TaskManager tm = new TaskManager();
 
-        taskManager.createTask("Погладить кота", "НЕ ГЛАДИТЬ ПРОТИВ ШЕРСТИ, ОН КУСАЕТСЯ!!!");
+        Task task1 = new Task("name1", "description1");
+        Task task2 = new Task("name2", "description2");
+        tm.addTask(task1);
+        tm.addTask(task2);
 
-        taskManager.createEpic("ЖЫЗЕНЬ", "КАК ЖЫТЬ");
-        Epic epic = new Epic("Очень странные дела", "Кто-то украл мозг");
-        taskManager.addEpic(epic);//не знаю зачем, просто так можно
+        Epic epic1 = new Epic("name1", "description1");
+        Epic epic2 = new Epic("name2", "description2");
+        tm.addEpic(epic1);
+        tm.addEpic(epic2);
 
-        taskManager.createSubtask("Проснуться", "Очень сложно", 2);
-        taskManager.createSubtask("Покушать", "Очень приятно", 2);
-        SubTask subTask = new SubTask("Найти мозг", "Посмотреть в под столом, может укатился", epic);
-        taskManager.addSubTask(subTask, epic);
+        SubTask subTask1 = new SubTask("name1", "description1");
+        SubTask subTask2 = new SubTask("name2", "description2");
+        SubTask subTask3 = new SubTask("name3", "description3");
+        tm.addSubTask(subTask1);
+        tm.linkSubToEpic(subTask1, epic1);
 
-        System.out.println(taskManager.getTasks());
-        System.out.println(taskManager.getEpics());
-        System.out.println(taskManager.getSubTasks());
+        tm.addSubTask(subTask2);
+        tm.linkSubToEpic(subTask2, epic1);
 
-        taskManager.update(taskManager.getTask(1), Task.statusInProgress);
-        taskManager.update(taskManager.getSubTask(4), Task.statusDone);
-        taskManager.update(subTask, Task.statusDone);
+        tm.addSubTask(subTask3);
+        tm.linkSubToEpic(subTask3, epic2);
 
-        System.out.println("after updating");
-        System.out.println(taskManager.getTasks());
-        System.out.println(taskManager.getEpics());
-        System.out.println(taskManager.getSubTasks());
+        System.out.println(tm.getTasks());
+        System.out.println(tm.getEpics());
+        System.out.println(tm.getSubTasks());
+
+        SubTask subTask1Update = new SubTask("updated name", "updated description");
+        subTask1Update.setStatus(Task.statusDone);
+        tm.update(subTask1Update, 5);
+
+        SubTask subTask3Update = new SubTask("asdasd", "gogigagagagigo");
+        subTask3Update.setStatus(Task.statusDone);
+        tm.update(subTask3Update, 7);
+
+        System.out.println("\n\n AFTER UPDATE");
+        System.out.println(tm.getTasks());
+        System.out.println(tm.getEpics());
+        System.out.println(tm.getSubTasks());
+
+
     }
 }

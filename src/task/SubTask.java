@@ -31,15 +31,6 @@ public class SubTask extends Task {
         return id == subTask.id && parentEpic == subTask.parentEpic;
     }
 
-    @Override
-    public void setStatus(String status) {
-        if (!(status.equals(statusNew) || status.equals(statusInProgress) || status.equals(statusDone))) {
-            System.out.println("Unrecognizable status, use other value");
-            return;
-        }
-        this.status = status;
-    }
-
     public void linkToEpic(int epic) {
         parentEpic = epic;
     }

@@ -34,11 +34,11 @@ public class Main {
 
         SubTask subTask1Update = new SubTask("updated name", "updated description");
         subTask1Update.setStatus(Task.statusDone);
-        tm.update(subTask1Update, 5);
+        tm.updateSubTask(subTask1Update, 5);
 
         SubTask subTask3Update = new SubTask("asdasd", "gogigagagagigo");
         subTask3Update.setStatus(Task.statusDone);
-        tm.update(subTask3Update, 7);
+        tm.updateSubTask(subTask3Update, 7);
 
         System.out.println("\n\n AFTER UPDATE");
         System.out.println(tm.getTasks());

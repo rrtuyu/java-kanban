@@ -50,7 +50,7 @@ public class TaskManager {
         id++;
     }
 
-    public void linkSubToEpic(SubTask subTask, Epic epic){
+    public void linkSubToEpic(SubTask subTask, Epic epic) {
         subTask.linkToEpic(epic.getId());
         epic.addSubTask(subTask.getId());
     }
@@ -209,7 +209,7 @@ public class TaskManager {
             System.out.println("There is no sub task with id=" + id);
     }
 
-    public void update(Task task, int id) {
+    public void updateTask(Task task, int id) {
         if (task == null) {
             System.out.println("Empty object can't be updated");
             return;
@@ -221,7 +221,7 @@ public class TaskManager {
             System.out.println("No such a task in tracking, unable to update");
     }
 
-    public void update(SubTask subTask, int id) {
+    public void updateSubTask(SubTask subTask, int id) {
         if (subTask == null) {
             System.out.println("Empty object can't be updated");
             return;
@@ -236,7 +236,7 @@ public class TaskManager {
             System.out.println("No such a sub task in tracking, unable to update");
     }
 
-    public void update(Epic epic, int id) {
+    public void updateEpic(Epic epic, int id) {
         if (epic == null) {
             System.out.println("Empty object can't be updated");
             return;
@@ -250,7 +250,7 @@ public class TaskManager {
 
     private void updateEpic(Epic epic) {
         int doneCounter = 0;
-        List<Integer> subTasks = getSubTasksOf(epic);
+        List<Integer> subTasks = epic.getSubTasks();
         if (subTasks.isEmpty()) {
             epic.setStatus(Task.statusNew);
             return;
@@ -272,14 +272,18 @@ public class TaskManager {
             epic.setStatus(Task.statusNew);
     }
 
-    public List<Integer> getSubTasksOf(Epic epic) {
+    public List<SubTask> getSubTasksOf(Epic epic) {
         if (epic == null) {
-            System.out.println("This epic os empty");
+            System.out.println("This epic is empty");
             return null;
         }
-        if (epics.containsValue(epic))
-            return epic.getSubTasks();
-        else {
+        if (epics.containsKey(epic.getId())) {
+            ArrayList<SubTask> result = new ArrayList<>();
+            List<Integer> idList = epic.getSubTasks();
+            for (Integer id : idList)
+                result.add(subTasks.get(id));
+            return result;
+        } else {
             System.out.println("No such an epic in tracking, invalid operation");
             return null;
         }

@@ -1,291 +1,55 @@
 package manager;
 
+
 import task.*;
-
-import java.util.ArrayList;
 import java.util.List;
-import java.util.HashMap;
 
-public class TaskManager {
-    private int id;
-    private HashMap<Integer, Task> tasks;
-    private HashMap<Integer, Epic> epics;
-    private HashMap<Integer, SubTask> subTasks;
-
-    public TaskManager() {
-        id = 1;
-        tasks = new HashMap<>();
-        epics = new HashMap<>();
-        subTasks = new HashMap<>();
-    }
-
+public interface TaskManager<T extends Task> {
     //Создание
-    public void addTask(Task task) {
-        if (task == null) {
-            System.out.println("Empty object can't be added");
-            return;
-        }
-        tasks.put(id, task);
-        task.setId(id);
-        id++;
-    }
+    void addTask(Task task);
 
-    public void addEpic(Epic epic) {
-        if (epic == null) {
-            System.out.println("Empty object can't be added");
-            return;
-        }
-        epics.put(id, epic);
-        epic.setId(id);
-        id++;
-    }
+    void addEpic(Epic epic);
 
-    public void addSubTask(SubTask subTask) {
-        if (subTask == null) {
-            System.out.println("Empty object can't be added");
-            return;
-        }
-        subTasks.put(id, subTask);
-        subTask.setId(id);
-        id++;
-    }
+    void addSubTask(SubTask subTask);
 
-    public void linkSubToEpic(SubTask subTask, Epic epic) {
-        subTask.linkToEpic(epic.getId());
-        epic.addSubTask(subTask.getId());
-    }
+    void linkSubToEpic(SubTask subTask, Epic epic);
 
     //Получение списка всех задач
-    public List<Task> getTasks() {
-        if (tasks.isEmpty()) {
-            System.out.println("There are no tasks");
-            return null;
-        }
-        return new ArrayList<>(tasks.values());
-    }
+    List<Task> getTasks();
 
-    public List<Epic> getEpics() {
-        if (epics.isEmpty()) {
-            System.out.println("There are no epics");
-            return null;
-        }
-        return new ArrayList<>(epics.values());
-    }
+    List<Epic> getEpics();
 
-    public List<SubTask> getSubTasks() {
-        if (subTasks.isEmpty()) {
-            System.out.println("There are no sub tasks");
-            return null;
-        }
-        return new ArrayList<>(subTasks.values());
-    }
+    List<SubTask> getSubTasks();
 
     //Удаление всех задач
-    public void clearTasks() {
-        if (tasks.isEmpty()) {
-            System.out.println("Task list is already clear");
-            return;
-        }
-        tasks.clear();
-    }
+    void clearTasks();
 
-    public void clearEpics() {
-        if (epics.isEmpty()) {
-            System.out.println("Epic list is already clear");
-            return;
-        }
-        for (Epic epic : epics.values()) {
-            if (epic.getSubTasks() != null) {
-                clearSubTasks(epic.getSubTasks());
-                epic.clear();
-            }
-            epics.clear();
-        }
-    }
+    void clearEpics();
 
-    public void clearSubTasks() {
-        if (subTasks.isEmpty()) {
-            System.out.println("Sub task list is already empty");
-            return;
-        }
-        for (SubTask subTask : subTasks.values()) {
-            Integer parent = subTask.getParentEpic();
-            if (parent != null) {
-                Epic currentParent = epics.get(parent);
-                currentParent.removeSubtask(subTask.getId());
-                updateEpic(currentParent);
-            }
-        }
-        subTasks.clear();
-    }
-
-    //вспомогательный метод для очистки списка эпиков
-    private void clearSubTasks(List<Integer> idList) {
-        for (Integer id : idList) {
-            subTasks.remove(id);
-        }
-    }
+    void clearSubTasks();
 
     //Получение по идентификатору
-    public Task getTask(int id) {
-        if (tasks.isEmpty()) {
-            System.out.println("Task list is empty");
-            return null;
-        }
-        if (tasks.containsKey(id)) {
-            return tasks.get(id);
-        } else {
-            System.out.println("There is no task with id=" + id);
-            return null;
-        }
-    }
+    Task getTask(int id);
 
-    public Epic getEpic(int id) {
-        if (epics.isEmpty()) {
-            System.out.println("Epic list is empty");
-            return null;
-        }
-        if (epics.containsKey(id)) {
-            return epics.get(id);
-        } else {
-            System.out.println("There is no epic with id=" + id);
-            return null;
-        }
-    }
+    Epic getEpic(int id);
 
-    public SubTask getSubTask(int id) {
-        if (subTasks.isEmpty()) {
-            System.out.println("Sub task list is empty");
-            return null;
-        }
-        if (subTasks.containsKey(id)) {
-            return subTasks.get(id);
-        } else {
-            System.out.println("There is no subTask with id=" + id);
-            return null;
-        }
-    }
+    SubTask getSubTask(int id);
 
     //Удаление по идентификатору
-    public void removeTask(int id) {
-        if (tasks.isEmpty()) {
-            System.out.println("Task list is empty");
-            return;
-        }
-        if (tasks.containsKey(id))
-            tasks.remove(id);
-        else
-            System.out.println("There is no task with id=" + id);
+    void removeTask(int id);
 
-    }
+    void removeEpic(int id);
 
-    public void removeEpic(int id) {
-        if (epics.isEmpty()) {
-            System.out.println("Epic list is empty");
-            return;
-        }
-        if (epics.containsKey(id)) {
-            if (epics.get(id).getSubTasks() != null)
-                clearSubTasks(epics.get(id).getSubTasks());
-            epics.get(id).clear();
-            epics.remove(id);
-        } else
-            System.out.println("There is no epic with id=" + id);
-    }
+    void removeSubTask(int id);
 
-    public void removeSubTask(int id) {
-        if (subTasks.isEmpty()) {
-            System.out.println("Sub task list is empty");
-            return;
-        }
-        if (subTasks.containsKey(id)) {
-            Integer currentParent = subTasks.get(id).getParentEpic();
-            if (currentParent != null) {
-                epics.get(currentParent).removeSubtask(id);
-                updateEpic(epics.get(currentParent));
-            }
-            subTasks.remove(id);
-        } else
-            System.out.println("There is no sub task with id=" + id);
-    }
+    //возможно пойдет под нож
+    void updateTask(Task task, int id);
 
-    public void updateTask(Task task, int id) {
-        if (task == null) {
-            System.out.println("Empty object can't be updated");
-            return;
-        }
-        if (tasks.containsKey(id)) {
-            tasks.put(id, task);
-            task.setId(id);
-        } else
-            System.out.println("No such a task in tracking, unable to update");
-    }
+    void updateSubTask(SubTask subTask, int id);
 
-    public void updateSubTask(SubTask subTask, int id) {
-        if (subTask == null) {
-            System.out.println("Empty object can't be updated");
-            return;
-        }
-        if (subTasks.containsKey(id)) {
-            int parent = subTasks.get(id).getParentEpic();
-            subTasks.put(id, subTask);
-            subTask.setId(id);
-            subTask.linkToEpic(parent);
-            updateEpic(epics.get(parent));
-        } else
-            System.out.println("No such a sub task in tracking, unable to update");
-    }
+    void updateEpic(Epic epic, int id);
 
-    public void updateEpic(Epic epic, int id) {
-        if (epic == null) {
-            System.out.println("Empty object can't be updated");
-            return;
-        }
-        if (epics.containsKey(id)) {
-            epics.put(id, epic);
-            epic.setId(id);
-        } else
-            System.out.println("No such an epic in tracking, unable to update");
-    }
+    List<SubTask> getSubTasksOf(Epic epic);
 
-    private void updateEpic(Epic epic) {
-        int doneCounter = 0;
-        List<Integer> subTasks = epic.getSubTasks();
-        if (subTasks.isEmpty()) {
-            epic.setStatus(Task.statusNew);
-            return;
-        }
-        for (int subTask : subTasks) {
-            String subStatus = this.subTasks.get(subTask).getStatus();
-            if (subStatus.equals(Task.statusInProgress)) {
-                epic.setStatus(Task.statusInProgress);
-                return;
-            }
-            if (subStatus.equals(Task.statusDone))
-                doneCounter++;
-        }
-        if (doneCounter == subTasks.size())
-            epic.setStatus(Task.statusDone);
-        else if (doneCounter > 0)
-            epic.setStatus(Task.statusInProgress);
-        else
-            epic.setStatus(Task.statusNew);
-    }
-
-    public List<SubTask> getSubTasksOf(Epic epic) {
-        if (epic == null) {
-            System.out.println("This epic is empty");
-            return null;
-        }
-        if (epics.containsKey(epic.getId())) {
-            ArrayList<SubTask> result = new ArrayList<>();
-            List<Integer> idList = epic.getSubTasks();
-            for (Integer id : idList)
-                result.add(subTasks.get(id));
-            return result;
-        } else {
-            System.out.println("No such an epic in tracking, invalid operation");
-            return null;
-        }
-    }
+    List<T> getHistory();
 }

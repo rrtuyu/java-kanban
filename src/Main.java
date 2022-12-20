@@ -1,10 +1,11 @@
+import manager.InMemoryTaskManager;
 import manager.TaskManager;
 import task.*;
 
 public class Main {
 
     public static void main(String[] args) {
-        TaskManager tm = new TaskManager();
+        TaskManager tm = new InMemoryTaskManager();
 
         Task task1 = new Task("name1", "description1");
         Task task2 = new Task("name2", "description2");

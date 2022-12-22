@@ -1,11 +1,11 @@
-import manager.InMemoryTaskManager;
+import manager.Managers;
 import manager.TaskManager;
 import task.*;
 
 public class Main {
 
     public static void main(String[] args) {
-        TaskManager tm = new InMemoryTaskManager();
+        TaskManager tm = Managers.getDefault();
 
         Task task1 = new Task("name1", "description1");
         Task task2 = new Task("name2", "description2");
@@ -34,11 +34,11 @@ public class Main {
         System.out.println(tm.getSubTasks());
 
         SubTask subTask1Update = new SubTask("updated name", "updated description");
-        subTask1Update.setStatus(Task.statusDone);
+        subTask1Update.setStatus(Status.DONE);
         tm.updateSubTask(subTask1Update, 5);
 
         SubTask subTask3Update = new SubTask("asdasd", "gogigagagagigo");
-        subTask3Update.setStatus(Task.statusDone);
+        subTask3Update.setStatus(Status.DONE);
         tm.updateSubTask(subTask3Update, 7);
 
         System.out.println("\n\n AFTER UPDATE");
@@ -46,6 +46,11 @@ public class Main {
         System.out.println(tm.getEpics());
         System.out.println(tm.getSubTasks());
 
+        tm.getTask(1);
+        tm.getSubTask(7);
+        tm.getTask(1);
+
+        System.out.println(tm.getHistory());
 
     }
 }

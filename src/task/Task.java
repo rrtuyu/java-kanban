@@ -2,18 +2,14 @@ package task;
 
 public class Task {
     protected int id;
-    protected String status;
+    protected Status status;
     protected String name;
     protected String description;
-    //константы имен статусов
-    public static final String statusNew = "NEW";
-    public static final String statusInProgress = "IN_PROGRESS";
-    public static final String statusDone = "DONE";
 
     public Task(String name, String description) {
         this.name = name;
         this.description = description;
-        status = statusNew;
+        status = Status.NEW;
     }
 
     @Override
@@ -42,7 +38,7 @@ public class Task {
         return description;
     }
 
-    public String getStatus() {
+    public Status getStatus() {
         return status;
     }
 
@@ -54,8 +50,8 @@ public class Task {
         this.description = description;
     }
 
-    public void setStatus(String status) {
-        if (!(status.equals(statusNew) || status.equals(statusInProgress) || status.equals(statusDone))) {
+    public void setStatus(Status status) {
+        if (!(status.equals(Status.NEW) || status.equals(Status.IN_PROGRESS) || status.equals(Status.DONE))) {
             System.out.println("Unrecognizable status, use other value");
             return;
         }

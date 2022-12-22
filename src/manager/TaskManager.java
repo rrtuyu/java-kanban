@@ -4,7 +4,7 @@ package manager;
 import task.*;
 import java.util.List;
 
-public interface TaskManager<T extends Task> {
+public interface TaskManager {
     //Создание
     void addTask(Task task);
 
@@ -51,5 +51,5 @@ public interface TaskManager<T extends Task> {
 
     List<SubTask> getSubTasksOf(Epic epic);
 
-    List<T> getHistory();
+    List<Task> getHistory();
 }

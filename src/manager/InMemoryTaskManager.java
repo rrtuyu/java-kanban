@@ -4,21 +4,20 @@ import task.*;
 
 import java.util.*;
 
-public class InMemoryTaskManager<T extends Task> implements TaskManager {
+class InMemoryTaskManager implements TaskManager {
     private int id;
     private HashMap<Integer, Task> tasks;
     private HashMap<Integer, Epic> epics;
     private HashMap<Integer, SubTask> subTasks;
 
-    private static final byte HISTORY_CAPACITY = 10;
-    private List<T> history;
+    HistoryManager history;
 
     public InMemoryTaskManager() {
         id = 1;
         tasks = new HashMap<>();
         epics = new HashMap<>();
         subTasks = new HashMap<>();
-        history = new ArrayList<>(HISTORY_CAPACITY);
+        history = Managers.getDefaultHistory();
     }
 
     //Создание
@@ -147,6 +146,7 @@ public class InMemoryTaskManager<T extends Task> implements TaskManager {
             return null;
         }
         if (tasks.containsKey(id)) {
+            history.add(tasks.get(id));
             return tasks.get(id);
         } else {
             System.out.println("There is no task with id=" + id);
@@ -161,6 +161,7 @@ public class InMemoryTaskManager<T extends Task> implements TaskManager {
             return null;
         }
         if (epics.containsKey(id)) {
+            history.add(epics.get(id));
             return epics.get(id);
         } else {
             System.out.println("There is no epic with id=" + id);
@@ -175,6 +176,7 @@ public class InMemoryTaskManager<T extends Task> implements TaskManager {
             return null;
         }
         if (subTasks.containsKey(id)) {
+            history.add(subTasks.get(id));
             return subTasks.get(id);
         } else {
             System.out.println("There is no subTask with id=" + id);
@@ -274,24 +276,24 @@ public class InMemoryTaskManager<T extends Task> implements TaskManager {
         int doneCounter = 0;
         List<Integer> subTasks = epic.getSubTasks();
         if (subTasks.isEmpty()) {
-            epic.setStatus(Task.statusNew);
+            epic.setStatus(Status.NEW);
             return;
         }
         for (int subTask : subTasks) {
-            String subStatus = this.subTasks.get(subTask).getStatus();
-            if (subStatus.equals(Task.statusInProgress)) {
-                epic.setStatus(Task.statusInProgress);
+            Status subStatus = this.subTasks.get(subTask).getStatus();
+            if (subStatus.equals(Status.NEW)) {
+                epic.setStatus(Status.IN_PROGRESS);
                 return;
             }
-            if (subStatus.equals(Task.statusDone))
+            if (subStatus.equals(Status.DONE))
                 doneCounter++;
         }
         if (doneCounter == subTasks.size())
-            epic.setStatus(Task.statusDone);
+            epic.setStatus(Status.DONE);
         else if (doneCounter > 0)
-            epic.setStatus(Task.statusInProgress);
+            epic.setStatus(Status.IN_PROGRESS);
         else
-            epic.setStatus(Task.statusNew);
+            epic.setStatus(Status.NEW);
     }
 
     @Override
@@ -312,22 +314,8 @@ public class InMemoryTaskManager<T extends Task> implements TaskManager {
         }
     }
 
-    //обработка истории запросов
     @Override
-    public List<T> getHistory() {
-        return history;
-    }
-
-    private void historyAdd(T task) {
-        history.add(task);
-        historyCheck();
-    }
-
-    private void historyCheck() {
-        if (history.size() > HISTORY_CAPACITY){
-            history.remove(0);
-            for (int i = 0; i < history.size(); i++)
-                Collections.swap(history, i + 1, i);
-        }
+    public List<Task> getHistory(){
+        return history.getHistory();
     }
 }

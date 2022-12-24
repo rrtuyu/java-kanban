@@ -6,11 +6,10 @@ import java.util.*;
 
 class InMemoryTaskManager implements TaskManager {
     private int id;
-    private HashMap<Integer, Task> tasks;
-    private HashMap<Integer, Epic> epics;
-    private HashMap<Integer, SubTask> subTasks;
-
-    HistoryManager history;
+    private Map<Integer, Task> tasks;
+    private Map<Integer, Epic> epics;
+    private Map<Integer, SubTask> subTasks;
+    private HistoryManager history;
 
     public InMemoryTaskManager() {
         id = 1;
@@ -146,8 +145,9 @@ class InMemoryTaskManager implements TaskManager {
             return null;
         }
         if (tasks.containsKey(id)) {
-            history.add(tasks.get(id));
-            return tasks.get(id);
+            Task task = tasks.get(id);
+            history.add(task);
+            return task;
         } else {
             System.out.println("There is no task with id=" + id);
             return null;
@@ -161,8 +161,9 @@ class InMemoryTaskManager implements TaskManager {
             return null;
         }
         if (epics.containsKey(id)) {
-            history.add(epics.get(id));
-            return epics.get(id);
+            Epic epic = epics.get(id);
+            history.add(epic);
+            return epic;
         } else {
             System.out.println("There is no epic with id=" + id);
             return null;
@@ -176,8 +177,9 @@ class InMemoryTaskManager implements TaskManager {
             return null;
         }
         if (subTasks.containsKey(id)) {
-            history.add(subTasks.get(id));
-            return subTasks.get(id);
+            SubTask subTask = subTasks.get(id);
+            history.add(subTask);
+            return subTask;
         } else {
             System.out.println("There is no subTask with id=" + id);
             return null;

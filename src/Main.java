@@ -45,11 +45,53 @@ public class Main {
         System.out.println(tm.getTasks());
         System.out.println(tm.getEpics());
         System.out.println(tm.getSubTasks());
-
+        
+        System.out.println("Тест истории\ntm.getTask(1);");
         tm.getTask(1);
+        System.out.println(tm.getHistory());
+
+        System.out.println("tm.getTask(7);");
         tm.getSubTask(7);
-        tm.getTask(1);
+        System.out.println(tm.getHistory());
 
+        System.out.println("tm.getSubTask(6);");
+        tm.getSubTask(6);
+        System.out.println(tm.getHistory());
+
+        System.out.println("tm.getTask(1);");
+        tm.getTask(1);
+        System.out.println(tm.getHistory());
+
+        System.out.println("tm.getTask(2);");
+        tm.getTask(2);
+        System.out.println(tm.getHistory());
+
+        System.out.println("tm.getEpic(3);");
+        tm.getEpic(3);
+        System.out.println(tm.getHistory());
+
+        System.out.println("tm.getEpic(3);");
+        tm.getEpic(3);
+        System.out.println(tm.getHistory());
+
+        System.out.println("tm.getEpic(4);");
+        tm.getEpic(4);
+        System.out.println(tm.getHistory());
+
+        System.out.println("tm.getSubTask(5);");
+        tm.getSubTask(5);
+        System.out.println(tm.getHistory());
+
+        System.out.println("tm.getTask(7);");
+        tm.getTask(1);
+        System.out.println(tm.getHistory());
+
+        System.out.println("tm.getTask(2);");
+        tm.getTask(2);
+        System.out.println(tm.getHistory());
+
+        System.out.println("tm.getTask(1);");
+        tm.getTask(1);
         System.out.println(tm.getHistory());
 
     }

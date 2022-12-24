@@ -39,15 +39,9 @@ public class Epic extends Task {
             System.out.println("There are no sub tasks in this epic");
             return;
         }
-        if (subTasks.contains(subTask)) {
-            for (int i = 0; i < subTasks.size(); i++) {
-                if (subTasks.get(i) == subTask) {
-                    subTasks.remove(i);
-                    System.out.println("Sub task [ID=" + subTask + "] successfully removed");
-                    return;
-                }
-            }
-        } else
+        if (subTasks.remove((Integer) subTask))
+            System.out.println("Sub task [ID=" + subTask + "] successfully removed");
+        else
             System.out.println("There is no such a sub task to remove");
     }
 

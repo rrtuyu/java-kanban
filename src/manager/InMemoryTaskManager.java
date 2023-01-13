@@ -134,6 +134,7 @@ class InMemoryTaskManager implements TaskManager {
     private void clearSubTasks(List<Integer> idList) {
         for (Integer id : idList) {
             subTasks.remove(id);
+            history.remove(id);
         }
     }
 
@@ -193,9 +194,10 @@ class InMemoryTaskManager implements TaskManager {
             System.out.println("Task list is empty");
             return;
         }
-        if (tasks.containsKey(id))
+        if (tasks.containsKey(id)) {
             tasks.remove(id);
-        else
+            history.remove(id);
+        } else
             System.out.println("There is no task with id=" + id);
 
     }
@@ -207,10 +209,12 @@ class InMemoryTaskManager implements TaskManager {
             return;
         }
         if (epics.containsKey(id)) {
-            if (epics.get(id).getSubTasks() != null)
-                clearSubTasks(epics.get(id).getSubTasks());
+            List<Integer> ST = epics.get(id).getSubTasks();
+            if (ST != null)
+                clearSubTasks(ST);
             epics.get(id).clear();
             epics.remove(id);
+            history.remove(id);
         } else
             System.out.println("There is no epic with id=" + id);
     }
@@ -228,6 +232,7 @@ class InMemoryTaskManager implements TaskManager {
                 updateEpic(epics.get(currentParent));
             }
             subTasks.remove(id);
+            history.remove(id);
         } else
             System.out.println("There is no sub task with id=" + id);
     }

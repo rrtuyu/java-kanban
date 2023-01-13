@@ -7,11 +7,6 @@ public class Main {
     public static void main(String[] args) {
         TaskManager tm = Managers.getDefault();
 
-        Task task1 = new Task("name1", "description1");
-        Task task2 = new Task("name2", "description2");
-        tm.addTask(task1);
-        tm.addTask(task2);
-
         Epic epic1 = new Epic("name1", "description1");
         Epic epic2 = new Epic("name2", "description2");
         tm.addEpic(epic1);
@@ -27,71 +22,45 @@ public class Main {
         tm.linkSubToEpic(subTask2, epic1);
 
         tm.addSubTask(subTask3);
-        tm.linkSubToEpic(subTask3, epic2);
+        tm.linkSubToEpic(subTask3, epic1);
 
-        System.out.println(tm.getTasks());
-        System.out.println(tm.getEpics());
-        System.out.println(tm.getSubTasks());
 
-        SubTask subTask1Update = new SubTask("updated name", "updated description");
-        subTask1Update.setStatus(Status.DONE);
-        tm.updateSubTask(subTask1Update, 5);
-
-        SubTask subTask3Update = new SubTask("asdasd", "gogigagagagigo");
-        subTask3Update.setStatus(Status.DONE);
-        tm.updateSubTask(subTask3Update, 7);
-
-        System.out.println("\n\n AFTER UPDATE");
-        System.out.println(tm.getTasks());
-        System.out.println(tm.getEpics());
-        System.out.println(tm.getSubTasks());
-        
-        System.out.println("Тест истории\ntm.getTask(1);");
-        tm.getTask(1);
+        // ТЕСТ ИСКЛЮЧЕНИЯ ПОВТОРЕНИЙ
+        System.out.println("Тест истории\ntm.getEpic(1);");
+        tm.getEpic(1);
         System.out.println(tm.getHistory());
 
-        System.out.println("tm.getTask(7);");
-        tm.getSubTask(7);
+        System.out.println("Тест истории\ntm.getSubTask(3);");
+        tm.getSubTask(3);
         System.out.println(tm.getHistory());
 
-        System.out.println("tm.getSubTask(6);");
-        tm.getSubTask(6);
+        System.out.println("Тест истории\ntm.getSubTask(4);");
+        tm.getSubTask(4);
         System.out.println(tm.getHistory());
 
-        System.out.println("tm.getTask(1);");
-        tm.getTask(1);
-        System.out.println(tm.getHistory());
-
-        System.out.println("tm.getTask(2);");
-        tm.getTask(2);
-        System.out.println(tm.getHistory());
-
-        System.out.println("tm.getEpic(3);");
-        tm.getEpic(3);
-        System.out.println(tm.getHistory());
-
-        System.out.println("tm.getEpic(3);");
-        tm.getEpic(3);
-        System.out.println(tm.getHistory());
-
-        System.out.println("tm.getEpic(4);");
-        tm.getEpic(4);
-        System.out.println(tm.getHistory());
-
-        System.out.println("tm.getSubTask(5);");
+        System.out.println("Тест истории\ntm.getSubTask(5);");
         tm.getSubTask(5);
         System.out.println(tm.getHistory());
 
-        System.out.println("tm.getTask(7);");
-        tm.getTask(1);
+        System.out.println("Тест истории\ntm.getEpic(1);");
+        tm.getEpic(1);
         System.out.println(tm.getHistory());
 
-        System.out.println("tm.getTask(2);");
-        tm.getTask(2);
+        System.out.println("Тест истории\ntm.getEpic(2);");
+        tm.getEpic(2);
         System.out.println(tm.getHistory());
 
-        System.out.println("tm.getTask(1);");
-        tm.getTask(1);
+        System.out.println("Тест истории\ntm.getEpic(1);");
+        tm.getEpic(1);
+        System.out.println(tm.getHistory());
+
+        //ТЕСТ УДАЛЕНИЯ ИЗ ИСТОРИИ НЕСУЩЕСТВУЮЩИХ ЭЛЕМЕНТОВ
+        System.out.println("Тест истории\ntm.removeSubTask(3);");
+        tm.removeSubTask(3);
+        System.out.println(tm.getHistory());
+
+        System.out.println("Тест истории\ntm.removeEpic(1);");
+        tm.removeEpic(1);
         System.out.println(tm.getHistory());
 
     }

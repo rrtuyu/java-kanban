@@ -18,14 +18,10 @@ public class InMemoryHistoryManager implements HistoryManager {
     public void add(Task task) {
         int id = task.getId();
 
+        if (historyMap.containsKey(id))
+            remove(id);
 
-        if (historyMap.containsKey(id)) {
-            Node<Task> node = historyMap.get(id);
-            historyList.removeNode(node);
-        }
         historyMap.put(id, historyList.linkLast(task));
-
-
     }
 
     @Override
@@ -35,18 +31,16 @@ public class InMemoryHistoryManager implements HistoryManager {
 
     @Override
     public void remove(int id) {
-        Node<Task> node = historyMap.get(id);
-        if (node != null) {
+        Node<Task> node = historyMap.remove(id);
+        if (node != null)
             historyList.removeNode(node);
-            historyMap.remove(id);
-        }
     }
 }
 
 class CustomLinkedList<T extends Task> {
 
-    public Node<T> head;
-    public Node<T> tail;
+    private Node<T> head;
+    private Node<T> tail;
     private int size;
 
     CustomLinkedList() {
@@ -55,7 +49,7 @@ class CustomLinkedList<T extends Task> {
         tail = null;
     }
 
-    public Node<T> linkLast(T data) {
+    Node<T> linkLast(T data) {
         Node<T> t = tail;
         Node<T> newNode = new Node<>(data, t, null);
         tail = newNode;
@@ -67,7 +61,7 @@ class CustomLinkedList<T extends Task> {
         return newNode;
     }
 
-    public void removeNode(Node<T> node) {
+    void removeNode(Node<T> node) {
         Node<T> prev = node.prev;
         Node<T> next = node.next;
 
@@ -88,14 +82,10 @@ class CustomLinkedList<T extends Task> {
         size--;
     }
 
-    public List<T> getTasks() {
+    List<T> getTasks() {
         List<T> hList = new ArrayList<>();
         for (Node<T> n = head; n != null; n = n.next)
             hList.add(n.data);
         return hList;
-    }
-
-    public Integer size() {
-        return size;
     }
 }

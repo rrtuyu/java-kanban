@@ -1,7 +1,6 @@
 package manager;
 
 import task.Task;
-
 import java.util.*;
 
 public class InMemoryHistoryManager implements HistoryManager {

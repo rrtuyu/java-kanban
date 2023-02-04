@@ -1,15 +1,14 @@
 package manager;
 
 import task.*;
-
 import java.util.*;
 
 class InMemoryTaskManager implements TaskManager {
-    private int id;
-    private Map<Integer, Task> tasks;
-    private Map<Integer, Epic> epics;
-    private Map<Integer, SubTask> subTasks;
-    private HistoryManager history;
+    protected int id;
+    protected Map<Integer, Task> tasks;
+    protected Map<Integer, Epic> epics;
+    protected Map<Integer, SubTask> subTasks;
+    protected HistoryManager history;
 
     public InMemoryTaskManager() {
         id = 1;

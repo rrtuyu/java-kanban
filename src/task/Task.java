@@ -14,6 +14,7 @@ public class Task {
 
     @Override
     public String toString() {
+
         return "Task{" +
                 "id=" + id +
                 ", status='" + status + '\'' +
@@ -40,6 +41,12 @@ public class Task {
 
     public Status getStatus() {
         return status;
+    }
+
+    public Type getType() {
+        if (this instanceof SubTask) return Type.SUBTASK;
+        if (this instanceof Epic) return Type.EPIC;
+        return Type.TASK;
     }
 
     public void setName(String name) {

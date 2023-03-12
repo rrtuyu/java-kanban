@@ -1,7 +1,12 @@
 package manager;
 
 import task.*;
-import java.util.*;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 
 class InMemoryTaskManager implements TaskManager {
     protected int id;
@@ -21,7 +26,7 @@ class InMemoryTaskManager implements TaskManager {
     //Создание
 
     @Override
-    public void addTask(Task task) {
+    public void addTask(Task task) throws NullPointerException{
         if (task == null) {
             System.out.println("Empty object can't be added");
             return;

@@ -2,22 +2,44 @@ package manager;
 
 import task.*;
 
-import java.io.BufferedWriter;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.Writer;
+import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
-public class FileBackedTaskManager extends InMemoryTaskManager implements TaskManager {
+public class FileBackedTaskManager extends InMemoryTaskManager {
+    private final String DIR = "src/manager/history/";
     private String file;
     private static final String HEADER = "id,type,name,status,description,epic";
     private final List<String> taskList;
 
+    private FileBackedTaskManager() {
+        super();
+        taskList = new ArrayList<>();
+        this.file = DIR + "DefaultTM.csv";
+
+        if (!Files.exists(Path.of(file))) {
+            try {
+                Files.createFile(Path.of(file));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
     public FileBackedTaskManager(String file) {
         super();
         taskList = new ArrayList<>();
-        this.file = file;
+        this.file = DIR + file;
+
+        if (!Files.exists(Path.of(file))) {
+            try {
+                Files.createFile(Path.of(file));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     @Override
@@ -48,57 +70,146 @@ public class FileBackedTaskManager extends InMemoryTaskManager implements TaskMa
         save();
     }
 
-    //TODO сделать метод для сохранения текущего состояние менеджера в файл
-    private void save() {
-        writeDown();
+    @Override
+    public Task getTask(int id) {
+        Task task = super.getTask(id);
+        save();
+        return task;
     }
 
-    private void writeDown() throws IOException{
+    @Override
+    public Epic getEpic(int id) {
+        Epic epic = super.getEpic(id);
+        save();
+        return epic;
+    }
+
+    @Override
+    public SubTask getSubTask(int id) {
+        SubTask subTask = super.getSubTask(id);
+        save();
+        return subTask;
+    }
+
+    private void save() throws ManagerSaveException {
+        try {
+            writeDown();
+        } catch (IOException e) {
+            throw new ManagerSaveException("Unable to write history in " + file);
+        }
+
+    }
+
+    private void updateTaskList() { //выделил метод для сбора тасков из контейнеров, чтобы не итерироваться по ним без необходимости
+        taskList.clear();
+        for (Task task : tasks.values())
+            taskList.add(toString(task));
+
+        for (Epic epic : epics.values())
+            taskList.add(toString(epic));
+
+        for (SubTask subTask : subTasks.values())
+            taskList.add(toString(subTask));
+    }
+
+    private void writeDown() throws IOException {
         try (Writer writer = new FileWriter(file, false); BufferedWriter bw = new BufferedWriter(writer)) {
             bw.write(HEADER + "\n");
 
             for (String task : taskList)
                 bw.write(task + "\n");
 
+            bw.write("\n" + historyToString(history));
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    private String taskToString(Task task) {
+    private String toString(Task task) {
         Type type = task.getType();
         String result = task.getId() + "," +
                 type + "," +
                 task.getName() + "," +
                 task.getStatus() + "," +
-                task.getDescription() + ",";
+                task.getDescription();
 
         if (type == Type.SUBTASK) {
             SubTask sTask = (SubTask) task;
             Integer parent = sTask.getParentEpic();
             if (parent != null)
-                result += parent;
+                result += "," + parent;
         }
         return result;
     }
 
-    private Task taskFromString(String value){
-
+    public static String historyToString(HistoryManager manager) {
+        List<String> IdHistory = new ArrayList<>();
+        for (Task task : manager.getHistory()) {
+            IdHistory.add(String.valueOf(task.getId()));
+        }
+        return String.join(",", IdHistory);
     }
 
-    private void updateTaskList() { //очень на нравится эта функция, но пока ничего другого не придумать не могу
-        taskList.clear();
-        for (Task task : tasks.values())
-            taskList.add(taskToString(task));
+    private Task fromString(String value) {
 
-        for (Epic epic : epics.values())
-            taskList.add(taskToString(epic));
-
-        for (SubTask subTask : subTasks.values())
-            taskList.add(taskToString(subTask));
+        String[] taskStr = value.split(",");
+        switch (Type.valueOf(taskStr[1])) {
+            case EPIC:
+                Epic epic = new Epic(taskStr[2], taskStr[4]);
+                epic.setId(Integer.parseInt(taskStr[0]));
+                epic.setStatus(Status.valueOf(taskStr[3]));
+                addEpic(epic);
+                return epic;
+            case SUBTASK:
+                SubTask subTask = new SubTask(taskStr[2], taskStr[4]);
+                subTask.setId(Integer.parseInt(taskStr[0]));
+                subTask.setStatus(Status.valueOf(taskStr[3]));
+                addSubTask(subTask);
+                if (taskStr.length == 6)
+                    linkSubToEpic(subTask,
+                            epics.get(Integer.parseInt(taskStr[5])));
+                return subTask;
+            default:
+                Task task = new Task(taskStr[0], taskStr[4]);
+                task.setId(Integer.parseInt(taskStr[0]));
+                task.setStatus(Status.valueOf(taskStr[3]));
+                addTask(task);
+                return task;
+        }
     }
 
-    private static String historyToString(HistoryManager manager){
+    public static List<Integer> historyFromString(String strHistory) {
+        List<Integer> h = new ArrayList<>();
+        for (String id : strHistory.split(",")) {
+            h.add(Integer.parseInt(id));
+        }
+        return h;
+    }
 
+    public static FileBackedTaskManager loadFromFile(File file) {
+        FileBackedTaskManager manager = new FileBackedTaskManager();
+        try (Reader reader = new FileReader(file); BufferedReader br = new BufferedReader(reader)) {
+            for (String elem : getContent(br)) {
+                //String[] item = elem.split(",");
+                if (elem.isEmpty()) break;
+                manager.fromString(elem);
+            }
+        } catch (FileNotFoundException e) {
+            System.err.println(e.getMessage());
+            return null;
+        } catch (IOException e) {
+            System.err.println(e.getMessage());
+            return null;
+        }
+        return manager;
+    }
+
+    private static List<String> getContent(BufferedReader br) throws IOException {
+        List<String> content = new ArrayList<>();
+        br.readLine();
+        while (br.ready()) {
+            content.add(br.readLine());
+        }
+        return content;
     }
 }

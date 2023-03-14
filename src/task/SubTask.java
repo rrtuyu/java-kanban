@@ -28,7 +28,14 @@ public class SubTask extends Task {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         SubTask subTask = (SubTask) o;
-        return id == subTask.id && parentEpic == subTask.parentEpic;
+        return hashCode() == o.hashCode();
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = super.hashCode();
+        hash = 31 * hash + parentEpic;
+        return hash;
     }
 
     public void linkToEpic(int epic) {

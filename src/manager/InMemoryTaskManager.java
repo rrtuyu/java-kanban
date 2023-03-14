@@ -23,17 +23,41 @@ class InMemoryTaskManager implements TaskManager {
         history = Managers.getDefaultHistory();
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null) return false;
+        if (o.getClass() != this.getClass()) return false;
+        TaskManager otherManager = (TaskManager) o;
+        return hashCode() == o.hashCode();
+    }
+
+    @Override
+    public int hashCode() {
+        int prime = 31;
+        int hash = 17;
+        hash = prime * hash + tasks.hashCode();
+        hash = prime * hash + epics.hashCode();
+        hash = prime * hash + subTasks.hashCode();
+        hash = prime * hash + getHistory().hashCode();
+        return hash;
+    }
+
     //Создание
 
     @Override
-    public void addTask(Task task) throws NullPointerException{
+    public void addTask(Task task) throws NullPointerException {
         if (task == null) {
             System.out.println("Empty object can't be added");
             return;
         }
-        tasks.put(id, task);
-        task.setId(id);
-        id++;
+        if (!task.hasId()) {
+            tasks.put(id, task);
+            task.setId(id);
+        } else {
+            tasks.put(task.getId(), task);
+        }
+        id++; //small brain moment: итерирую id в любом случае, чтобы при загрузке из файла айдишники не поплыли
     }
 
     @Override
@@ -42,8 +66,12 @@ class InMemoryTaskManager implements TaskManager {
             System.out.println("Empty object can't be added");
             return;
         }
-        epics.put(id, epic);
-        epic.setId(id);
+        if (!epic.hasId()) {
+            epics.put(id, epic);
+            epic.setId(id);
+        } else {
+            epics.put(epic.getId(), epic);
+        }
         id++;
     }
 
@@ -53,8 +81,12 @@ class InMemoryTaskManager implements TaskManager {
             System.out.println("Empty object can't be added");
             return;
         }
-        subTasks.put(id, subTask);
-        subTask.setId(id);
+        if (!subTask.hasId()) {
+            subTasks.put(id, subTask);
+            subTask.setId(id);
+        } else {
+            subTasks.put(subTask.getId(), subTask);
+        }
         id++;
     }
 
@@ -113,8 +145,8 @@ class InMemoryTaskManager implements TaskManager {
                 clearSubTasks(epic.getSubTasks());
                 epic.clear();
             }
-            epics.clear();
         }
+        epics.clear();
     }
 
     @Override
@@ -326,7 +358,7 @@ class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public List<Task> getHistory(){
+    public List<Task> getHistory() {
         return history.getHistory();
     }
 }

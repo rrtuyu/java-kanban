@@ -2,6 +2,7 @@ package task;
 
 public class Task {
     protected int id;
+    protected boolean hasId;
     protected Status status;
     protected String name;
     protected String description;
@@ -10,6 +11,7 @@ public class Task {
         this.name = name;
         this.description = description;
         status = Status.NEW;
+        hasId = false;
     }
 
     @Override
@@ -22,12 +24,39 @@ public class Task {
                 '}';
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null) return false;
+        if (this.getClass() != o.getClass()) return false;
+        Task otherTask = (Task) o;
+
+        return hashCode() == otherTask.hashCode();
+    }
+
+    @Override
+    public int hashCode() {
+        int prime = 31;
+        int hash = 17;
+        hash = prime * hash + name.hashCode();
+        hash = prime * hash + description.hashCode();
+        hash = prime * hash + id;
+        hash = prime * hash + status.hashCode();
+        hash = prime * hash + getClass().hashCode();
+        return hash;
+    }
+
     public int getId() {
         return id;
     }
 
     public void setId(int id) {
         this.id = id;
+        hasId = true;
+    }
+
+    public boolean hasId() {
+        return hasId;
     }
 
     public String getName() {

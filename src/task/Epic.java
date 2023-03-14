@@ -27,7 +27,14 @@ public class Epic extends Task {
         if (o == this) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Epic epic = (Epic) o;
-        return id == epic.id;
+        return hashCode() == o.hashCode();
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = super.hashCode();
+        hash = 31 * hash + subTasks.hashCode();
+        return hash;
     }
 
     public void addSubTask(int subTask) {

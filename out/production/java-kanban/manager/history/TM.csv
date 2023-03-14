@@ -1,10 +1,10 @@
 id,type,name,status,description,epic
-3,EPIC,name1,NEW,description1
-6,EPIC,name2,NEW,description2
-1,EPIC,name1,NEW,description1
-4,EPIC,name2,NEW,description2
-2,SUBTASK,name1,NEW,description1,1
-5,SUBTASK,name2,NEW,description2,1
-7,SUBTASK,name3,NEW,description3,4
+3,TASK,task1,NEW,description1
+6,TASK,task2,NEW,description2
+1,EPIC,epic1,NEW,description1
+4,EPIC,epic2,NEW,description2
+2,SUBTASK,subtask1,NEW,description1,1
+5,SUBTASK,subtask2,NEW,description2,1
+7,SUBTASK,subtask3,NEW,description3,4
 
 3,1,2,4

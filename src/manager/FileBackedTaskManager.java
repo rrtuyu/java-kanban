@@ -59,13 +59,13 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         System.out.println("initial managers' tasks\n" + tm.getTasks());
         System.out.println("loaded managers' tasks\n" + loadedManager.getTasks());
 
-        System.out.println("\ninitial managers' epics\n" + loadedManager.getEpics());
+        System.out.println("\ninitial managers' epics\n" + tm.getEpics());
         System.out.println("loaded managers' epics\n" + loadedManager.getEpics());
 
-        System.out.println("\ninitial managers' sub tasks\n" + loadedManager.getSubTasks());
+        System.out.println("\ninitial managers' sub tasks\n" + tm.getSubTasks());
         System.out.println("loaded managers' sub tasks\n" + loadedManager.getSubTasks());
 
-        System.out.println("\nloaded managers' history\n" + loadedManager.getHistory());
+        System.out.println("\nloaded managers' history\n" + tm.getHistory());
         System.out.println("loaded managers' history\n" + loadedManager.getHistory());
 
         System.out.println("\nManager has been recovered properly: " + tm.equals(loadedManager));

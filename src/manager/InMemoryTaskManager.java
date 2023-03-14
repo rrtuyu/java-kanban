@@ -54,10 +54,13 @@ class InMemoryTaskManager implements TaskManager {
         if (!task.hasId()) {
             tasks.put(id, task);
             task.setId(id);
+            id++;
         } else {
-            tasks.put(task.getId(), task);
+            int outerId = task.getId();
+            tasks.put(outerId, task);
+            if (outerId > id)
+                id = outerId + 1; // спасибо большое :)
         }
-        id++; //small brain moment: итерирую id в любом случае, чтобы при загрузке из файла айдишники не поплыли
     }
 
     @Override

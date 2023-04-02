@@ -267,8 +267,10 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
 
     private static List<Integer> historyFromString(String strHistory) {
         List<Integer> h = new ArrayList<>();
-        for (String id : strHistory.split(",")) {
-            h.add(Integer.parseInt(id));
+        if (!strHistory.isEmpty()) {
+            for (String id : strHistory.split(",")) {
+                h.add(Integer.parseInt(id));
+            }
         }
         return h;
     }

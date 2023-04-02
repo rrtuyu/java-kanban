@@ -54,13 +54,13 @@ class InMemoryTaskManager implements TaskManager {
         if (!task.hasId()) {
             tasks.put(id, task);
             task.setId(id);
-            id++;
         } else {
             int outerId = task.getId();
             tasks.put(outerId, task);
             if (outerId > id)
-                id = outerId + 1; // спасибо большое :)
+                id = outerId;
         }
+        id++;
     }
 
     @Override
@@ -73,7 +73,10 @@ class InMemoryTaskManager implements TaskManager {
             epics.put(id, epic);
             epic.setId(id);
         } else {
+            int outerId = epic.getId();
             epics.put(epic.getId(), epic);
+            if (outerId > id)
+                id = outerId;
         }
         id++;
     }
@@ -88,7 +91,10 @@ class InMemoryTaskManager implements TaskManager {
             subTasks.put(id, subTask);
             subTask.setId(id);
         } else {
+            int outerId = subTask.getId();
             subTasks.put(subTask.getId(), subTask);
+            if (outerId > id)
+                id = outerId;
         }
         id++;
     }
@@ -327,9 +333,8 @@ class InMemoryTaskManager implements TaskManager {
         }
         for (int subTask : subTasks) {
             Status subStatus = this.subTasks.get(subTask).getStatus();
-            if (subStatus.equals(Status.NEW)) {
+            if (!subStatus.equals(Status.NEW)) {
                 epic.setStatus(Status.IN_PROGRESS);
-                return;
             }
             if (subStatus.equals(Status.DONE))
                 doneCounter++;
@@ -338,8 +343,6 @@ class InMemoryTaskManager implements TaskManager {
             epic.setStatus(Status.DONE);
         else if (doneCounter > 0)
             epic.setStatus(Status.IN_PROGRESS);
-        else
-            epic.setStatus(Status.NEW);
     }
 
     @Override

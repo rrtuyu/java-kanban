@@ -1,4 +1,4 @@
-id,type,name,status,description,epic
+id,type,name,status,description,epic,start,end
 3,TASK,task1,NEW,description1
 6,TASK,task2,NEW,description2
 1,EPIC,epic1,NEW,description1

@@ -1,19 +1,12 @@
 package manager;
 
-import manager.TaskManager;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
-import static org.junit.jupiter.api.Assertions.*;
-
-import task.Epic;
-import task.Status;
-import task.SubTask;
-import task.Task;
+import task.*;
 
 import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 abstract class TaskManagerTest<T extends TaskManager> {
     T manager;

@@ -1,14 +1,20 @@
 package task;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
 public class Epic extends Task {
     private ArrayList<Integer> subTasks;
+    private LocalDateTime endTime;
 
     public Epic(String name, String description) {
         super(name, description);
         subTasks = new ArrayList<>();
+        duration = Duration.ZERO;
+        startTime = LocalDateTime.MAX;
+        endTime = LocalDateTime.MIN;
     }
 
     @Override
@@ -35,6 +41,24 @@ public class Epic extends Task {
         int hash = super.hashCode();
         hash = 31 * hash + subTasks.hashCode();
         return hash;
+    }
+
+    @Override
+    public void setDuration(LocalDateTime startTime, long durationInMinutes) throws IllegalArgumentException {
+        if (durationInMinutes <= 0)
+            throw new IllegalArgumentException("Duration must be more than 0. Provided: " + duration);
+        if (startTime == null)
+            throw new IllegalArgumentException("Provided start time can't be null");
+
+        if (startTime.isBefore(this.startTime))
+            this.startTime = startTime;
+
+        LocalDateTime localDeadLine = this.startTime.plusMinutes(durationInMinutes);
+
+        if (localDeadLine.isAfter(this.endTime))
+            this.endTime = localDeadLine;
+
+        this.duration = Duration.between(startTime, endTime);
     }
 
     public void addSubTask(int subTask) {

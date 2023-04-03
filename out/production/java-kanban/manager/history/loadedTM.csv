@@ -1,5 +1,10 @@
-id,type,name,status,description,epic
-3,EPIC,test epic 1,NEW,test epic description 1
-4,SUBTASK,test subtask 1,NEW,test subtask description 1,3
-5,SUBTASK,test subtask 2,NEW,test subtask description 2,3
+id,type,name,status,description,epic,start,end
+3,TASK,task1,NEW,description1
+6,TASK,task2,NEW,description2
+1,EPIC,epic1,NEW,description1
+4,EPIC,epic2,NEW,description2
+2,SUBTASK,subtask1,NEW,description1,1
+5,SUBTASK,subtask2,NEW,description2,1
+7,SUBTASK,subtask3,NEW,description3,4
 
+3,1,2,4

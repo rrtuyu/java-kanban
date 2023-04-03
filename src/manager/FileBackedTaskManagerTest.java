@@ -1,17 +1,30 @@
 package manager;
 
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Test;
 import task.Epic;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 class FileBackedTaskManagerTest extends TaskManagerTest<FileBackedTaskManager> {
 
     @Override
     FileBackedTaskManager createNewManager() {
         return new FileBackedTaskManager("fileBackedTaskManager_test.csv");
+    }
+
+    @AfterAll
+    static void removeTestFile() {
+        try {
+            Files.delete(Path.of("src/manager/history/fileBackedTaskManager_test.csv"));
+        } catch (IOException e) {
+            System.out.println(e.getMessage());
+        }
     }
 
     @Test

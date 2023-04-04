@@ -5,13 +5,16 @@ import task.*;
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.TreeSet;
 
 public class FileBackedTaskManager extends InMemoryTaskManager {
     private static final String DIR = "src/manager/history/";
     private String file;
-    private static final String HEADER = "id,type,name,status,description,epic,start,end";
+    private static final String HEADER = "id,type,name,status,description,start,end,epic";
 
     public FileBackedTaskManager(String file) {
         super();
@@ -30,11 +33,17 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         TaskManager tm = Managers.getDefault();
 
         Task task1 = new Task("task1", "description1");
+        task1.setDuration(LocalDateTime.of(2022, 12, 2, 0, 0), 60l);
         Task task2 = new Task("task2", "description2");
+        task2.setDuration(LocalDateTime.of(2022, 12, 2, 1, 1), 15l);
+
         Epic epic1 = new Epic("epic1", "description1");
         Epic epic2 = new Epic("epic2", "description2");
+
         SubTask subTask1 = new SubTask("subtask1", "description1");
+        subTask1.setDuration(LocalDateTime.of(2023, 4, 4, 12, 0), 15l);
         SubTask subTask2 = new SubTask("subtask2", "description2");
+        subTask2.setDuration(subTask1.getEndTime().plusMinutes(1l), 20l);
         SubTask subTask3 = new SubTask("subtask3", "description3");
 
         tm.addEpic(epic1);
@@ -69,6 +78,10 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         System.out.println("loaded managers' history\n" + loadedManager.getHistory());
 
         System.out.println("\nManager has been recovered properly: " + tm.equals(loadedManager));
+
+        System.out.println("priority:\n" + tm.getPrioritizedTasks());
+        task1.setDuration(LocalDateTime.of(1999, 12, 31, 23, 40), 10l);
+        tm.updateTask(task1, task1.getId());
     }
 
     @Override
@@ -208,11 +221,16 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
 
     private String toString(Task task) {
         Type type = task.getType();
+        String start = getDateTimeAsString(task.getStartTime());
+        String end = getDateTimeAsString(task.getEndTime());
+
         String result = task.getId() + "," +
                 type + "," +
                 task.getName() + "," +
                 task.getStatus() + "," +
-                task.getDescription();
+                task.getDescription() + "," +
+                start + "," +
+                end;
 
         if (type == Type.SUBTASK) {
             SubTask sTask = (SubTask) task;
@@ -221,6 +239,13 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
                 result += "," + parent;
         }
         return result;
+    }
+
+    private String getDateTimeAsString(LocalDateTime dateTime) {
+        if (dateTime == null || dateTime.isEqual(LocalDateTime.MAX))
+            return "not set";
+
+        return dateTime.format(Task.FORMATTER);
     }
 
     public static String historyToString(HistoryManager manager) {
@@ -240,6 +265,17 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         String description = taskStr[4];
         int taskId = Integer.parseInt(taskStr[0]);
 
+        String startStr = taskStr[5];
+        String endStr = taskStr[6];
+        LocalDateTime start = null;
+        LocalDateTime end = null;
+        Duration duration = null;
+        if (!startStr.equals("not set") && !endStr.equals("not set")) {
+            start = LocalDateTime.parse(startStr, Task.FORMATTER);
+            end = LocalDateTime.parse(endStr, Task.FORMATTER);
+            duration = Duration.between(start, end);
+        }
+
         switch (type) {
             case EPIC:
                 Epic epic = new Epic(name, description);
@@ -252,15 +288,19 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
                 subTask.setStatus(status);
                 subTask.setId(taskId);
                 addSubTask(subTask);
-                if (taskStr.length == 6)
+                if (start != null && duration != null)
+                    subTask.setDuration(start, duration.toMinutes());
+                if (taskStr.length == 8)
                     linkSubToEpic(subTask,
-                            epics.get(Integer.parseInt(taskStr[5])));
+                            epics.get(Integer.parseInt(taskStr[7])));
                 return subTask;
             default:
                 Task task = new Task(name, description);
                 task.setStatus(status);
                 task.setId(taskId);
                 addTask(task);
+                if (start != null && duration != null)
+                    task.setDuration(start, duration.toMinutes());
                 return task;
         }
     }

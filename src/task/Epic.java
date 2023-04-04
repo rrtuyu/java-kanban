@@ -12,19 +12,33 @@ public class Epic extends Task {
     public Epic(String name, String description) {
         super(name, description);
         subTasks = new ArrayList<>();
-        duration = Duration.ZERO;
         startTime = LocalDateTime.MAX;
         endTime = LocalDateTime.MIN;
     }
 
     @Override
     public String toString() {
+        String start;
+        String end;
+
+        if (startTime.isEqual(LocalDateTime.MAX))
+            start = "not set";
+        else
+            start = startTime.format(FORMATTER);
+
+        if (endTime.isEqual(LocalDateTime.MIN))
+            end = "not set";
+        else
+            end = endTime.format(FORMATTER);
+
         return "Epic{" +
                 "id=" + id +
                 ", status='" + status + '\'' +
                 ", name='" + name + '\'' +
                 ", description='" + description + '\'' +
                 ", subTasks.size=" + subTasks.size() +
+                ", start='" + start + '\'' +
+                ", end='" + end + '\'' +
                 '}';
     }
 
@@ -53,12 +67,26 @@ public class Epic extends Task {
         if (startTime.isBefore(this.startTime))
             this.startTime = startTime;
 
-        LocalDateTime localDeadLine = this.startTime.plusMinutes(durationInMinutes);
+        LocalDateTime localDeadLine = startTime.plusMinutes(durationInMinutes);
 
         if (localDeadLine.isAfter(this.endTime))
             this.endTime = localDeadLine;
+    }
 
-        this.duration = Duration.between(startTime, endTime);
+    @Override
+    public LocalDateTime getStartTime() {
+        if (startTime.isEqual(LocalDateTime.MAX))
+            return null;
+
+        return startTime;
+    }
+
+    @Override
+    public LocalDateTime getEndTime() {
+        if (endTime.isEqual(LocalDateTime.MIN))
+            return null;
+
+        return endTime;
     }
 
     public void addSubTask(int subTask) {
@@ -84,5 +112,10 @@ public class Epic extends Task {
         if (subTasks.isEmpty())
             return;
         subTasks.clear();
+    }
+
+    public void resetTimings() {
+        startTime = LocalDateTime.MAX;
+        endTime = LocalDateTime.MIN;
     }
 }

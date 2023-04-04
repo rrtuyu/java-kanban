@@ -10,16 +10,32 @@ public class SubTask extends Task {
     @Override
     public String toString() {
         String parentEpicId;
+        String start;
+        String end;
+
         if (parentEpic == null)
             parentEpicId = "null";
         else
             parentEpicId = String.valueOf(parentEpic);
+
+        if (startTime == null)
+            start = "not set";
+        else
+            start = startTime.format(FORMATTER);
+
+        if (duration == null)
+            end = "not set";
+        else
+            end = startTime.plusMinutes(duration.toMinutes()).format(FORMATTER);
+
         return "SubTask{" +
                 "parentEpicId=" + parentEpicId +
                 ", id=" + id +
                 ", status='" + status + '\'' +
                 ", name='" + name + '\'' +
                 ", description='" + description + '\'' +
+                ", start='" + start + '\'' +
+                ", end='" + end + '\'' +
                 '}';
     }
 
@@ -34,7 +50,8 @@ public class SubTask extends Task {
     @Override
     public int hashCode() {
         int hash = super.hashCode();
-        hash = 31 * hash + parentEpic;
+        if (parentEpic != null)
+            hash = 31 * hash + parentEpic;
         return hash;
     }
 

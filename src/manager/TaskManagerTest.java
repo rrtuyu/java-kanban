@@ -4,7 +4,10 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import task.*;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.TreeSet;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -339,5 +342,130 @@ abstract class TaskManagerTest<T extends TaskManager> {
         manager.getEpic(3);
 
         assertIterableEquals(expected, manager.getHistory());
+    }
+
+    //test set for time related features
+    @Test
+    void shouldNotLetCollideTasksTimeCase1() {
+        Task testTask1 = new Task("asd", "asd");
+        testTask1.setDuration(LocalDateTime.of(2000, 1, 1, 0, 0), 10l);
+
+        Task testTask2 = new Task("asd", "asd");
+        testTask2.setDuration(LocalDateTime.of(2000, 1, 1, 0, 5), 10l);
+
+        IllegalArgumentException e = assertThrows(
+                IllegalArgumentException.class,
+                () -> {
+                    manager.addTask(testTask1);
+                    manager.addTask(testTask2);
+                });
+
+        assertTrue(e.getMessage().contains("Tasks' runtime should not collide."));
+    }
+
+    @Test
+    void shouldNotLetCollideTasksTimeCase2() {
+        Task testTask1 = new Task("asd", "asd");
+        testTask1.setDuration(LocalDateTime.of(2000, 1, 1, 0, 5), 10l);
+
+        Task testTask2 = new Task("asd", "asd");
+        testTask2.setDuration(LocalDateTime.of(2000, 1, 1, 0, 0), 10l);
+
+        IllegalArgumentException e = assertThrows(
+                IllegalArgumentException.class,
+                () -> {
+                    manager.addTask(testTask1);
+                    manager.addTask(testTask2);
+                });
+
+        assertTrue(e.getMessage().contains("Tasks' runtime should not collide."));
+    }
+
+    @Test
+    void shouldNotLetCollideTasksTimeCase3() {
+        Task testTask1 = new Task("asd", "asd");
+        testTask1.setDuration(LocalDateTime.of(2000, 1, 1, 0, 0), 10l);
+
+        Task testTask2 = new Task("asd", "asd");
+        testTask2.setDuration(LocalDateTime.of(2000, 1, 1, 0, 2), 5l);
+
+        IllegalArgumentException e = assertThrows(
+                IllegalArgumentException.class,
+                () -> {
+                    manager.addTask(testTask1);
+                    manager.addTask(testTask2);
+                });
+
+        assertTrue(e.getMessage().contains("Tasks' runtime should not collide."));
+    }
+
+    @Test
+    void shouldNotLetCollideTasksTimeCase4() {
+        Task testTask1 = new Task("asd", "asd");
+        testTask1.setDuration(LocalDateTime.of(2000, 1, 1, 0, 0), 10l);
+
+        Task testTask2 = new Task("asd", "asd");
+        testTask2.setDuration(LocalDateTime.of(2000, 1, 1, 0, 0), 10l);
+
+        IllegalArgumentException e = assertThrows(
+                IllegalArgumentException.class,
+                () -> {
+                    manager.addTask(testTask1);
+                    manager.addTask(testTask2);
+                });
+
+        assertTrue(e.getMessage().contains("Tasks' runtime should not collide."));
+    }
+
+    @Test
+    void addTaskWithTimeTest() {
+        Task testTask1 = new Task("asd", "asd");
+        testTask1.setDuration(LocalDateTime.of(2000, 1, 1, 0, 0), 10l);
+
+        Task testTask2 = new Task("asd", "asd");
+        testTask2.setDuration(LocalDateTime.of(2000, 1, 1, 0, 20), 10l);
+
+        assertDoesNotThrow(
+                () -> {
+                    manager.addTask(testTask1);
+                    manager.addTask(testTask2);
+                });
+    }
+
+    @Test
+    void getPrioritizedTasksTest() {
+        subTask1.setDuration(LocalDateTime.of(2000, 1, 1, 0, 0), 10l);
+        subTask2.setDuration(LocalDateTime.of(2000, 1, 1, 0, 20), 10l);
+        task1.setDuration(LocalDateTime.of(1999, 12, 31, 23, 40), 10l);
+
+        manager.updateTask(task1, task1.getId());
+        manager.updateSubTask(subTask1, subTask1.getId());
+        manager.updateSubTask(subTask2, subTask2.getId());
+
+        TreeSet<Task> expected = new TreeSet<>((t1, t2) -> {
+            LocalDateTime t1Start = t1.getStartTime();
+            LocalDateTime t2Start = t2.getStartTime();
+            if (t1Start == null || t1Start.isEqual(LocalDateTime.MAX))
+                return 1;
+            if (t2Start == null || t2Start.isEqual(LocalDateTime.MAX))
+                return -1;
+
+            if (t1.equals(t2))
+                return 0;
+
+            long deltaTime = Duration.between(t1Start, t2Start).toMinutes();
+            if (deltaTime > 0)
+                return -1;
+            else
+                return 1;
+        });
+        expected.add(task1);
+        expected.add(subTask1);
+        expected.add(subTask2);
+
+        System.out.println(expected);
+        System.out.println(manager.getPrioritizedTasks());
+
+        assertTrue(manager.getPrioritizedTasks().toString().contains(expected.toString().replaceAll("]", "")));
     }
 }

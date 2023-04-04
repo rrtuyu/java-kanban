@@ -6,7 +6,7 @@ import java.time.format.DateTimeFormatter;
 
 public class Task {
     protected int id;
-    DateTimeFormatter formatter;
+    public static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm");
     protected Duration duration;
     protected LocalDateTime startTime;
     protected boolean hasId;
@@ -19,7 +19,6 @@ public class Task {
         this.description = description;
         status = Status.NEW;
         hasId = false;
-        formatter = DateTimeFormatter.ofPattern("dd.MM.YYYY | hh:mm");
     }
 
     public void setDuration(LocalDateTime startTime, long durationInMinutes) throws IllegalArgumentException {
@@ -32,11 +31,15 @@ public class Task {
         this.startTime = startTime;
     }
 
-    public LocalDateTime getEndTime() throws IllegalArgumentException {
+    public LocalDateTime getStartTime() {
+        return startTime;
+    }
+
+    public LocalDateTime getEndTime(){
         if (startTime != null || duration != null)
             return startTime.plusMinutes(duration.toMinutes());
         else
-            throw new IllegalArgumentException("Start time and duration must be initialized to get end time");
+            return null;
     }
 
     @Override
@@ -47,12 +50,12 @@ public class Task {
         if (startTime == null)
             start = "not set";
         else
-            start = startTime.format(formatter);
+            start = startTime.format(FORMATTER);
 
         if (duration == null)
             end = "not set";
         else
-            end = startTime.plusMinutes(duration.toMinutes()).format(formatter);
+            end = startTime.plusMinutes(duration.toMinutes()).format(FORMATTER);
 
         return "Task{" +
                 "id=" + id +
@@ -83,6 +86,10 @@ public class Task {
         hash = prime * hash + id;
         hash = prime * hash + status.hashCode();
         hash = prime * hash + getClass().hashCode();
+        if (startTime != null && !startTime.isEqual(LocalDateTime.MAX)) {
+            hash = prime * hash + startTime.hashCode();
+            hash = prime * hash + getEndTime().hashCode();
+        }
         return hash;
     }
 

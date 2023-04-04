@@ -9,7 +9,6 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.TreeSet;
 
 public class FileBackedTaskManager extends InMemoryTaskManager {
     private static final String DIR = "src/manager/history/";
@@ -78,10 +77,6 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         System.out.println("loaded managers' history\n" + loadedManager.getHistory());
 
         System.out.println("\nManager has been recovered properly: " + tm.equals(loadedManager));
-
-        System.out.println("priority:\n" + tm.getPrioritizedTasks());
-        task1.setDuration(LocalDateTime.of(1999, 12, 31, 23, 40), 10l);
-        tm.updateTask(task1, task1.getId());
     }
 
     @Override

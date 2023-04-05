@@ -1,5 +1,7 @@
-package manager;
+package test;
 
+import manager.HistoryManager;
+import manager.InMemoryHistoryManager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import task.*;
@@ -10,14 +12,14 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class InMemoryHistoryManagerTest {
 
-    HistoryManager historyManager;
+    private HistoryManager historyManager;
 
-    Task task1;
-    Task task2;
-    Epic epic1;
-    Epic epic2;
-    SubTask subTask1;
-    SubTask subTask2;
+    private Task task1;
+    private Task task2;
+    private Epic epic1;
+    private Epic epic2;
+    private SubTask subTask1;
+    private SubTask subTask2;
 
     @BeforeEach
     void taskSetInit() {

@@ -32,17 +32,17 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         TaskManager tm = Managers.getDefault();
 
         Task task1 = new Task("task1", "description1");
-        task1.setDuration(LocalDateTime.of(2022, 12, 2, 0, 0), 60l);
+        task1.setDuration(LocalDateTime.of(2022, 12, 2, 0, 0), 60L);
         Task task2 = new Task("task2", "description2");
-        task2.setDuration(LocalDateTime.of(2022, 12, 2, 1, 1), 15l);
+        task2.setDuration(LocalDateTime.of(2022, 12, 2, 1, 1), 15L);
 
         Epic epic1 = new Epic("epic1", "description1");
         Epic epic2 = new Epic("epic2", "description2");
 
         SubTask subTask1 = new SubTask("subtask1", "description1");
-        subTask1.setDuration(LocalDateTime.of(2023, 4, 4, 12, 0), 15l);
+        subTask1.setDuration(LocalDateTime.of(2023, 4, 4, 12, 0), 15L);
         SubTask subTask2 = new SubTask("subtask2", "description2");
-        subTask2.setDuration(subTask1.getEndTime().plusMinutes(1l), 20l);
+        subTask2.setDuration(subTask1.getEndTime().plusMinutes(1L), 20L);
         SubTask subTask3 = new SubTask("subtask3", "description3");
 
         tm.addEpic(epic1);

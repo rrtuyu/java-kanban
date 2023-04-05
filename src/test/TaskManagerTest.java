@@ -1,27 +1,30 @@
-package manager;
+package test;
 
+import manager.TaskManager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import task.*;
+import task.Epic;
+import task.Status;
+import task.SubTask;
+import task.Task;
 
-import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.Iterator;
 import java.util.List;
-import java.util.TreeSet;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 abstract class TaskManagerTest<T extends TaskManager> {
-    T manager;
-    Task task1;
-    Task task2;
+    protected T manager;
+    private Task task1;
+    private Task task2;
 
-    Epic epic1;
+    private Epic epic1;
 
-    SubTask subTask1;
-    SubTask subTask2;
+    private SubTask subTask1;
+    private SubTask subTask2;
 
-    abstract T createNewManager();
+    protected abstract T createNewManager();
 
     @BeforeEach
     void taskSetInit() {
@@ -50,7 +53,7 @@ abstract class TaskManagerTest<T extends TaskManager> {
     //test set for Epic
     @Test
     void addEpicTest() {
-        Epic newEpic = new Epic("new epic", "new scription");
+        Epic newEpic = new Epic("new epic", "new description");
 
         manager.addEpic(newEpic);
         List<Epic> expected = List.of(epic1, newEpic);
@@ -68,7 +71,7 @@ abstract class TaskManagerTest<T extends TaskManager> {
 
     @Test
     void updateEpicTest() {
-        Epic newEpic = new Epic("new epic", "new descroption");
+        Epic newEpic = new Epic("new epic", "new description");
 
         manager.updateEpic(newEpic, 3);
         assertEquals(newEpic, manager.getEpic(3));
@@ -121,7 +124,7 @@ abstract class TaskManagerTest<T extends TaskManager> {
     }
 
     @Test
-    void shouldReturnIn_ProgressWnenSubsAreInDifferentStatusDone_New() {
+    void shouldReturnIn_ProgressWhenSubsAreInDifferentStatusDone_New() {
         Status expected = Status.IN_PROGRESS;
 
         subTask2.setStatus(Status.DONE);
@@ -131,7 +134,7 @@ abstract class TaskManagerTest<T extends TaskManager> {
     }
 
     @Test
-    void shouldReturnIn_ProgressWnenSubsAreInDifferentStatusInProgress_New() {
+    void shouldReturnIn_ProgressWhenSubsAreInDifferentStatusInProgress_New() {
         Status expected = Status.IN_PROGRESS;
 
         subTask2.setStatus(Status.IN_PROGRESS);
@@ -141,7 +144,7 @@ abstract class TaskManagerTest<T extends TaskManager> {
     }
 
     @Test
-    void shouldReturnIn_ProgressWnenSubsAreInDifferentStatusInProgress_Done() {
+    void shouldReturnIn_ProgressWhenSubsAreInDifferentStatusInProgress_Done() {
         Status expected = Status.IN_PROGRESS;
 
         subTask1.setStatus(Status.DONE);
@@ -196,7 +199,7 @@ abstract class TaskManagerTest<T extends TaskManager> {
     //test set for SubTask
     @Test
     void addSubTaskTest() {
-        SubTask newSub = new SubTask("new sub", "new scription");
+        SubTask newSub = new SubTask("new sub", "new description");
 
         manager.addSubTask(newSub);
         List<SubTask> expected = List.of(subTask1, subTask2, newSub);
@@ -271,7 +274,7 @@ abstract class TaskManagerTest<T extends TaskManager> {
     //test set for Task
     @Test
     void addTaskTest() {
-        Task newTask = new Task("new task", "new scription");
+        Task newTask = new Task("new task", "new description");
 
         manager.addTask(newTask);
         List<Task> expected = List.of(task1, task2, newTask);
@@ -345,13 +348,16 @@ abstract class TaskManagerTest<T extends TaskManager> {
     }
 
     //test set for time related features
+
+    //timeline1 |----|
+    //timeline2    |----|
     @Test
     void shouldNotLetCollideTasksTimeCase1() {
         Task testTask1 = new Task("asd", "asd");
-        testTask1.setDuration(LocalDateTime.of(2000, 1, 1, 0, 0), 10l);
+        testTask1.setDuration(LocalDateTime.of(2000, 1, 1, 0, 0), 10L);
 
         Task testTask2 = new Task("asd", "asd");
-        testTask2.setDuration(LocalDateTime.of(2000, 1, 1, 0, 5), 10l);
+        testTask2.setDuration(LocalDateTime.of(2000, 1, 1, 0, 5), 10L);
 
         IllegalArgumentException e = assertThrows(
                 IllegalArgumentException.class,
@@ -363,13 +369,15 @@ abstract class TaskManagerTest<T extends TaskManager> {
         assertTrue(e.getMessage().contains("Tasks' runtime should not collide."));
     }
 
+    //timeline1    |----|
+    //timeline2 |----|
     @Test
     void shouldNotLetCollideTasksTimeCase2() {
         Task testTask1 = new Task("asd", "asd");
-        testTask1.setDuration(LocalDateTime.of(2000, 1, 1, 0, 5), 10l);
+        testTask1.setDuration(LocalDateTime.of(2000, 1, 1, 0, 5), 10L);
 
         Task testTask2 = new Task("asd", "asd");
-        testTask2.setDuration(LocalDateTime.of(2000, 1, 1, 0, 0), 10l);
+        testTask2.setDuration(LocalDateTime.of(2000, 1, 1, 0, 0), 10L);
 
         IllegalArgumentException e = assertThrows(
                 IllegalArgumentException.class,
@@ -381,13 +389,15 @@ abstract class TaskManagerTest<T extends TaskManager> {
         assertTrue(e.getMessage().contains("Tasks' runtime should not collide."));
     }
 
+    //timeline1 |----|
+    //timeline2  |--|
     @Test
     void shouldNotLetCollideTasksTimeCase3() {
         Task testTask1 = new Task("asd", "asd");
-        testTask1.setDuration(LocalDateTime.of(2000, 1, 1, 0, 0), 10l);
+        testTask1.setDuration(LocalDateTime.of(2000, 1, 1, 0, 0), 10L);
 
         Task testTask2 = new Task("asd", "asd");
-        testTask2.setDuration(LocalDateTime.of(2000, 1, 1, 0, 2), 5l);
+        testTask2.setDuration(LocalDateTime.of(2000, 1, 1, 0, 2), 5L);
 
         IllegalArgumentException e = assertThrows(
                 IllegalArgumentException.class,
@@ -399,13 +409,15 @@ abstract class TaskManagerTest<T extends TaskManager> {
         assertTrue(e.getMessage().contains("Tasks' runtime should not collide."));
     }
 
+    //timeline1  |--|
+    //timeline2 |----|
     @Test
     void shouldNotLetCollideTasksTimeCase4() {
         Task testTask1 = new Task("asd", "asd");
-        testTask1.setDuration(LocalDateTime.of(2000, 1, 1, 0, 0), 10l);
+        testTask1.setDuration(LocalDateTime.of(2000, 1, 1, 0, 2), 5L);
 
         Task testTask2 = new Task("asd", "asd");
-        testTask2.setDuration(LocalDateTime.of(2000, 1, 1, 0, 0), 10l);
+        testTask2.setDuration(LocalDateTime.of(2000, 1, 1, 0, 0), 10L);
 
         IllegalArgumentException e = assertThrows(
                 IllegalArgumentException.class,
@@ -417,13 +429,172 @@ abstract class TaskManagerTest<T extends TaskManager> {
         assertTrue(e.getMessage().contains("Tasks' runtime should not collide."));
     }
 
+    //timeline1 |----|
+    //timeline2 |----|
     @Test
-    void addTaskWithTimeTest() {
+    void shouldNotLetCollideTasksTimeCase5() {
         Task testTask1 = new Task("asd", "asd");
-        testTask1.setDuration(LocalDateTime.of(2000, 1, 1, 0, 0), 10l);
+        testTask1.setDuration(LocalDateTime.of(2000, 1, 1, 0, 0), 10L);
 
         Task testTask2 = new Task("asd", "asd");
-        testTask2.setDuration(LocalDateTime.of(2000, 1, 1, 0, 20), 10l);
+        testTask2.setDuration(LocalDateTime.of(2000, 1, 1, 0, 0), 10L);
+
+        IllegalArgumentException e = assertThrows(
+                IllegalArgumentException.class,
+                () -> {
+                    manager.addTask(testTask1);
+                    manager.addTask(testTask2);
+                });
+
+        assertTrue(e.getMessage().contains("Tasks' runtime should not collide."));
+    }
+
+    //timeline1 |----|
+    //timeline2 |--------|
+    @Test
+    void shouldNotLetCollideTasksTimeCase6() {
+        Task testTask1 = new Task("asd", "asd");
+        testTask1.setDuration(LocalDateTime.of(2000, 1, 1, 0, 0), 10L);
+
+        Task testTask2 = new Task("asd", "asd");
+        testTask2.setDuration(LocalDateTime.of(2000, 1, 1, 0, 0), 20L);
+
+        IllegalArgumentException e = assertThrows(
+                IllegalArgumentException.class,
+                () -> {
+                    manager.addTask(testTask1);
+                    manager.addTask(testTask2);
+                });
+
+        assertTrue(e.getMessage().contains("Tasks' runtime should not collide."));
+    }
+
+    //timeline1 |--------|
+    //timeline2 |----|
+    @Test
+    void shouldNotLetCollideTasksTimeCase7() {
+        Task testTask1 = new Task("asd", "asd");
+        testTask1.setDuration(LocalDateTime.of(2000, 1, 1, 0, 0), 20L);
+
+        Task testTask2 = new Task("asd", "asd");
+        testTask2.setDuration(LocalDateTime.of(2000, 1, 1, 0, 0), 10L);
+
+        IllegalArgumentException e = assertThrows(
+                IllegalArgumentException.class,
+                () -> {
+                    manager.addTask(testTask1);
+                    manager.addTask(testTask2);
+                });
+
+        assertTrue(e.getMessage().contains("Tasks' runtime should not collide."));
+    }
+
+    //timeline1     |----|
+    //timeline2 |--------|
+    @Test
+    void shouldNotLetCollideTasksTimeCase8() {
+        Task testTask1 = new Task("asd", "asd");
+        testTask1.setDuration(LocalDateTime.of(2000, 1, 1, 0, 10), 10L);
+
+        Task testTask2 = new Task("asd", "asd");
+        testTask2.setDuration(LocalDateTime.of(2000, 1, 1, 0, 0), 20L);
+
+        IllegalArgumentException e = assertThrows(
+                IllegalArgumentException.class,
+                () -> {
+                    manager.addTask(testTask1);
+                    manager.addTask(testTask2);
+                });
+
+        assertTrue(e.getMessage().contains("Tasks' runtime should not collide."));
+    }
+
+    //timeline1 |--------|
+    //timeline2     |----|
+    @Test
+    void shouldNotLetCollideTasksTimeCase9() {
+        Task testTask1 = new Task("asd", "asd");
+        testTask1.setDuration(LocalDateTime.of(2000, 1, 1, 0, 0), 20L);
+
+        Task testTask2 = new Task("asd", "asd");
+        testTask2.setDuration(LocalDateTime.of(2000, 1, 1, 0, 10), 10L);
+
+        IllegalArgumentException e = assertThrows(
+                IllegalArgumentException.class,
+                () -> {
+                    manager.addTask(testTask1);
+                    manager.addTask(testTask2);
+                });
+
+        assertTrue(e.getMessage().contains("Tasks' runtime should not collide."));
+    }
+
+    //timeline1 |----|
+    //timeline2      |----|
+    @Test
+    void shouldNotLetCollideTasksTimeCase10() {
+        Task testTask1 = new Task("asd", "asd");
+        testTask1.setDuration(LocalDateTime.of(2000, 1, 1, 0, 0), 10L);
+
+        Task testTask2 = new Task("asd", "asd");
+        testTask2.setDuration(LocalDateTime.of(2000, 1, 1, 0, 10), 10L);
+
+        IllegalArgumentException e = assertThrows(
+                IllegalArgumentException.class,
+                () -> {
+                    manager.addTask(testTask1);
+                    manager.addTask(testTask2);
+                });
+
+        assertTrue(e.getMessage().contains("Tasks' runtime should not collide."));
+    }
+
+    //timeline1      |----|
+    //timeline2 |----|
+    @Test
+    void shouldNotLetCollideTasksTimeCase11() {
+        Task testTask1 = new Task("asd", "asd");
+        testTask1.setDuration(LocalDateTime.of(2000, 1, 1, 0, 10), 10L);
+
+        Task testTask2 = new Task("asd", "asd");
+        testTask2.setDuration(LocalDateTime.of(2000, 1, 1, 0, 0), 10L);
+
+        IllegalArgumentException e = assertThrows(
+                IllegalArgumentException.class,
+                () -> {
+                    manager.addTask(testTask1);
+                    manager.addTask(testTask2);
+                });
+
+        assertTrue(e.getMessage().contains("Tasks' runtime should not collide."));
+    }
+
+    //timeline1 |----|
+    //timeline2       |----|
+    @Test
+    void addTaskWithTimeTest1() {
+        Task testTask1 = new Task("asd", "asd");
+        testTask1.setDuration(LocalDateTime.of(2000, 1, 1, 0, 0), 10L);
+
+        Task testTask2 = new Task("asd", "asd");
+        testTask2.setDuration(LocalDateTime.of(2000, 1, 1, 0, 11), 10L);
+
+        assertDoesNotThrow(
+                () -> {
+                    manager.addTask(testTask1);
+                    manager.addTask(testTask2);
+                });
+    }
+
+    //timeline1       |----|
+    //timeline2 |----|
+    @Test
+    void addTaskWithTimeTest2() {
+        Task testTask1 = new Task("asd", "asd");
+        testTask1.setDuration(LocalDateTime.of(2000, 1, 1, 0, 11), 10L);
+
+        Task testTask2 = new Task("asd", "asd");
+        testTask2.setDuration(LocalDateTime.of(2000, 1, 1, 0, 0), 10L);
 
         assertDoesNotThrow(
                 () -> {
@@ -434,38 +605,35 @@ abstract class TaskManagerTest<T extends TaskManager> {
 
     @Test
     void getPrioritizedTasksTest() {
-        subTask1.setDuration(LocalDateTime.of(2000, 1, 1, 0, 0), 10l);
-        subTask2.setDuration(LocalDateTime.of(2000, 1, 1, 0, 20), 10l);
-        task1.setDuration(LocalDateTime.of(1999, 12, 31, 23, 40), 10l);
+        subTask1.setDuration(LocalDateTime.of(2000, 1, 1, 0, 0), 10L);
+        subTask2.setDuration(LocalDateTime.of(2000, 1, 1, 0, 20), 10L);
+        task1.setDuration(LocalDateTime.of(1999, 12, 31, 23, 40), 10L);
 
         manager.updateTask(task1, task1.getId());
         manager.updateSubTask(subTask1, subTask1.getId());
         manager.updateSubTask(subTask2, subTask2.getId());
 
-        TreeSet<Task> expected = new TreeSet<>((t1, t2) -> {
-            LocalDateTime t1Start = t1.getStartTime();
-            LocalDateTime t2Start = t2.getStartTime();
-            if (t1Start == null || t1Start.isEqual(LocalDateTime.MAX))
-                return 1;
-            if (t2Start == null || t2Start.isEqual(LocalDateTime.MAX))
-                return -1;
+        Iterator<Task> expected = manager.getPrioritizedTasks().iterator();
 
-            if (t1.equals(t2))
-                return 0;
+        assertEquals(task1, expected.next());
+        assertEquals(subTask1, expected.next());
+        assertEquals(subTask2, expected.next());
+        assertNull(expected.next().getStartTime());
+    }
 
-            long deltaTime = Duration.between(t1Start, t2Start).toMinutes();
-            if (deltaTime > 0)
-                return -1;
-            else
-                return 1;
-        });
-        expected.add(task1);
-        expected.add(subTask1);
-        expected.add(subTask2);
+    @Test
+    void getPriorityWhenIllegalTaskAdded() {
+        SubTask testSub1 = new SubTask("test1", "test1");
+        testSub1.setDuration(LocalDateTime.of(2000, 1, 1, 0, 0), 10L);
+        manager.addSubTask(testSub1);
 
-        System.out.println(expected);
-        System.out.println(manager.getPrioritizedTasks());
+        SubTask testSub2 = new SubTask("test2", "test2");
+        testSub2.setDuration(LocalDateTime.of(2000, 1, 1, 0, 5), 10L);
+        try {
+            manager.addSubTask(testSub2); //adding colliding task
+        } catch (IllegalArgumentException e) {}
 
-        assertTrue(manager.getPrioritizedTasks().toString().contains(expected.toString().replaceAll("]", "")));
+        assertTrue(manager.getPrioritizedTasks().contains(testSub1));
+        assertFalse(manager.getPrioritizedTasks().contains(testSub2));
     }
 }

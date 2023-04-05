@@ -1,11 +1,12 @@
-import manager.FileBackedTaskManager;
+import manager.Managers;
+import manager.TaskManager;
 import task.Epic;
 import task.SubTask;
 
 public class Main {
 
     public static void main(String[] args) {
-        FileBackedTaskManager tm = new FileBackedTaskManager("TM.csv");
+        TaskManager tm = Managers.getFileBackedManager("TM.csv");
 
         Epic epic1 = new Epic("name1", "description1");
         Epic epic2 = new Epic("name2", "description2");

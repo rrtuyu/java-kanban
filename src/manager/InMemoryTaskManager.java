@@ -65,7 +65,7 @@ class InMemoryTaskManager implements TaskManager {
     //Создание
 
     @Override
-    public void addTask(Task task) throws NullPointerException {
+    public void addTask(Task task) throws IllegalArgumentException {
         if (task == null) {
             System.out.println("Empty object can't be added");
             return;
@@ -79,8 +79,8 @@ class InMemoryTaskManager implements TaskManager {
             if (outerId > id)
                 id = outerId;
         }
-        addToPriorityList(task);
-        id++;
+        addToPriorityList(task); //при обнаружении коллизий метод выбросит IllegalArgumentException
+        id++;                    //возможно не самое удачное имя для метода TODO придумать более подходящее
     }
 
     @Override
@@ -102,7 +102,7 @@ class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public void addSubTask(SubTask subTask) {
+    public void addSubTask(SubTask subTask) throws IllegalArgumentException {
         if (subTask == null) {
             System.out.println("Empty object can't be added");
             return;
@@ -285,9 +285,9 @@ class InMemoryTaskManager implements TaskManager {
             return;
         }
         if (epics.containsKey(id)) {
-            List<Integer> ST = epics.get(id).getSubTasks();
-            if (ST != null)
-                clearSubTasks(ST);
+            List<Integer> subs = epics.get(id).getSubTasks();
+            if (subs != null)
+                clearSubTasks(subs);
             epics.get(id).clear();
             epics.remove(id);
             history.remove(id);
@@ -315,7 +315,7 @@ class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public void updateTask(Task task, int id) {
+    public void updateTask(Task task, int id) throws IllegalArgumentException {
         if (task == null) {
             System.out.println("Empty object can't be updated");
             return;
@@ -329,7 +329,7 @@ class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public void updateSubTask(SubTask subTask, int id) {
+    public void updateSubTask(SubTask subTask, int id) throws IllegalArgumentException {
         if (subTask == null) {
             System.out.println("Empty object can't be updated");
             return;
@@ -405,6 +405,7 @@ class InMemoryTaskManager implements TaskManager {
         return history.getHistory();
     }
 
+    @Override
     public TreeSet<Task> getPrioritizedTasks() {
         return priorityTaskSet;
     }
@@ -434,16 +435,12 @@ class InMemoryTaskManager implements TaskManager {
         if (t1StartTime == null || t2StartTime == null)
             return false;
 
-        if (t2StartTime.isBefore(t1StartTime)) {
-            if (!t2EndTime.isBefore(t1StartTime))
-                return true;
-        } else if (t2StartTime.isAfter(t1StartTime)) {
-            if (!t2StartTime.isAfter(t1EndTime))
-                return true;
-        } else if (t2StartTime.isEqual(t1StartTime) || t2EndTime.isEqual(t1EndTime)) {
-            return true;
-        }
-        return false;
+        if (t2StartTime.isBefore(t1StartTime))
+            return !t2EndTime.isBefore(t1StartTime);
+        else if (t2StartTime.isAfter(t1StartTime))
+            return !t2StartTime.isAfter(t1EndTime);
+        else
+            return t2StartTime.isEqual(t1StartTime) || t2EndTime.isEqual(t1EndTime);
     }
 
     private void updateEpicDuration(Epic epic) {

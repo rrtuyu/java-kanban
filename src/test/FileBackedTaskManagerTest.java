@@ -1,5 +1,8 @@
-package manager;
+package test;
 
+import manager.FileBackedTaskManager;
+import manager.ManagerSaveException;
+import manager.TaskManager;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Test;
 import task.Epic;
@@ -14,7 +17,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class FileBackedTaskManagerTest extends TaskManagerTest<FileBackedTaskManager> {
 
     @Override
-    FileBackedTaskManager createNewManager() {
+    protected FileBackedTaskManager createNewManager() {
         return new FileBackedTaskManager("fileBackedTaskManager_test.csv");
     }
 

@@ -1,11 +1,13 @@
 package manager;
 
-import task.*;
+import task.Epic;
+import task.Status;
+import task.SubTask;
+import task.Task;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.*;
-
 
 class InMemoryTaskManager implements TaskManager {
     protected int id;
@@ -66,58 +68,75 @@ class InMemoryTaskManager implements TaskManager {
 
     @Override
     public void addTask(Task task) throws IllegalArgumentException {
-        if (task == null) {
-            System.out.println("Empty object can't be added");
-            return;
-        }
+        if (task == null)
+            throw new IllegalArgumentException("Empty object cannot be added");
+
         if (!task.hasId()) {
-            tasks.put(id, task);
             task.setId(id);
+            addToPriorityList(task);
+            tasks.put(id, task);
+            id++;
         } else {
             int outerId = task.getId();
+
+            if (checkIdCollision(outerId))
+                throw new IllegalArgumentException("Manager already has this instance");
+
+            addToPriorityList(task);
             tasks.put(outerId, task);
-            if (outerId > id)
-                id = outerId;
+            if (outerId > id) {
+                id = outerId + 1;
+                ++id;
+            }
         }
-        addToPriorityList(task); //при обнаружении коллизий метод выбросит IllegalArgumentException
-        id++;                    //возможно не самое удачное имя для метода TODO придумать более подходящее
     }
 
     @Override
-    public void addEpic(Epic epic) {
-        if (epic == null) {
-            System.out.println("Empty object can't be added");
-            return;
-        }
+    public void addEpic(Epic epic) throws IllegalArgumentException {
+        if (epic == null)
+            throw new IllegalArgumentException("Empty object cannot be added");
+
         if (!epic.hasId()) {
-            epics.put(id, epic);
             epic.setId(id);
+            epics.put(id, epic);
+            id++;
         } else {
             int outerId = epic.getId();
-            epics.put(epic.getId(), epic);
-            if (outerId > id)
-                id = outerId;
+
+            if (checkIdCollision(outerId))
+                throw new IllegalArgumentException("Manager already has this instance");
+
+            epics.put(outerId, epic);
+            if (outerId > id) {
+                id = outerId + 1;
+                ++id;
+            }
         }
-        id++;
     }
 
     @Override
     public void addSubTask(SubTask subTask) throws IllegalArgumentException {
-        if (subTask == null) {
-            System.out.println("Empty object can't be added");
-            return;
-        }
+        if (subTask == null)
+            throw new IllegalArgumentException("Empty object cannot be added");
+
         if (!subTask.hasId()) {
-            subTasks.put(id, subTask);
             subTask.setId(id);
+            addToPriorityList(subTask);
+            subTasks.put(id, subTask);
+            id++;
         } else {
             int outerId = subTask.getId();
+
+            if (checkIdCollision(outerId))
+                throw new IllegalArgumentException("Manager already has this instance");
+
+            addToPriorityList(subTask);
             subTasks.put(subTask.getId(), subTask);
-            if (outerId > id)
-                id = outerId;
+            if (outerId > id) {
+                id = outerId + 1;
+                ++id;
+            }
         }
-        addToPriorityList(subTask);
-        id++;
     }
 
     @Override
@@ -215,75 +234,68 @@ class InMemoryTaskManager implements TaskManager {
 
     //Получение по идентификатору
     @Override
-    public Task getTask(int id) {
-        if (tasks.isEmpty()) {
-            System.out.println("Task list is empty");
-            return null;
-        }
+    public Task getTask(int id) throws IllegalArgumentException {
+        if (tasks.isEmpty())
+            throw new IllegalArgumentException("Task list is empty");
+
         if (tasks.containsKey(id)) {
             Task task = tasks.get(id);
             history.add(task);
             return task;
         } else {
-            System.out.println("There is no task with id=" + id);
-            return null;
+            throw new IllegalArgumentException("There is no task with id=" + id);
         }
     }
 
     @Override
-    public Epic getEpic(int id) {
-        if (epics.isEmpty()) {
-            System.out.println("Epic list is empty");
-            return null;
-        }
+    public Epic getEpic(int id) throws IllegalArgumentException {
+        if (epics.isEmpty())
+            throw new IllegalArgumentException("Epic list is empty");
+
         if (epics.containsKey(id)) {
             Epic epic = epics.get(id);
             history.add(epic);
             return epic;
         } else {
-            System.out.println("There is no epic with id=" + id);
-            return null;
+            throw new IllegalArgumentException("There is no epic with id=" + id);
         }
     }
 
     @Override
-    public SubTask getSubTask(int id) {
-        if (subTasks.isEmpty()) {
-            System.out.println("Sub task list is empty");
-            return null;
-        }
+    public SubTask getSubTask(int id) throws IllegalArgumentException {
+        if (subTasks.isEmpty())
+            throw new IllegalArgumentException("Sub task list is empty");
+
         if (subTasks.containsKey(id)) {
             SubTask subTask = subTasks.get(id);
             history.add(subTask);
             return subTask;
         } else {
-            System.out.println("There is no subTask with id=" + id);
-            return null;
+            throw new IllegalArgumentException("There is no subTask with id=" + id);
         }
     }
 
     //Удаление по идентификатору
     @Override
-    public void removeTask(int id) {
-        if (tasks.isEmpty()) {
-            System.out.println("Task list is empty");
-            return;
-        }
+    public void removeTask(int id) throws IllegalArgumentException {
+        if (tasks.isEmpty())
+            throw new IllegalArgumentException("Task list is empty");
+
         if (tasks.containsKey(id)) {
             priorityTaskSet.remove(tasks.get(id));
             tasks.remove(id);
             history.remove(id);
-        } else
-            System.out.println("There is no task with id=" + id);
+        } else {
+            throw new IllegalArgumentException("There is no task with id=" + id);
+        }
 
     }
 
     @Override
-    public void removeEpic(int id) {
-        if (epics.isEmpty()) {
-            System.out.println("Epic list is empty");
-            return;
-        }
+    public void removeEpic(int id) throws IllegalArgumentException {
+        if (epics.isEmpty())
+            throw new IllegalArgumentException("Epic list is empty");
+
         if (epics.containsKey(id)) {
             List<Integer> subs = epics.get(id).getSubTasks();
             if (subs != null)
@@ -291,16 +303,16 @@ class InMemoryTaskManager implements TaskManager {
             epics.get(id).clear();
             epics.remove(id);
             history.remove(id);
-        } else
-            System.out.println("There is no epic with id=" + id);
+        } else {
+            throw new IllegalArgumentException("There is no epic with id=" + id);
+        }
     }
 
     @Override
-    public void removeSubTask(int id) {
-        if (subTasks.isEmpty()) {
-            System.out.println("Sub task list is empty");
-            return;
-        }
+    public void removeSubTask(int id) throws IllegalArgumentException {
+        if (subTasks.isEmpty())
+            throw new IllegalArgumentException("Sub task list is empty");
+
         if (subTasks.containsKey(id)) {
             Integer currentParent = subTasks.get(id).getParentEpic();
             if (currentParent != null) {
@@ -310,30 +322,30 @@ class InMemoryTaskManager implements TaskManager {
             priorityTaskSet.remove(subTasks.get(id));
             subTasks.remove(id);
             history.remove(id);
-        } else
-            System.out.println("There is no sub task with id=" + id);
+        } else {
+            throw new IllegalArgumentException("There is no sub task with id=" + id);
+        }
     }
 
     @Override
     public void updateTask(Task task, int id) throws IllegalArgumentException {
-        if (task == null) {
-            System.out.println("Empty object can't be updated");
-            return;
-        }
+        if (task == null)
+            throw new IllegalArgumentException("Empty object can't be updated");
+
         if (tasks.containsKey(id)) {
             tasks.put(id, task);
             task.setId(id);
             addToPriorityList(task);
-        } else
-            System.out.println("No such a task in tracking, unable to update");
+        } else {
+            throw new IllegalArgumentException("No such a task in tracking, unable to update");
+        }
     }
 
     @Override
     public void updateSubTask(SubTask subTask, int id) throws IllegalArgumentException {
-        if (subTask == null) {
-            System.out.println("Empty object can't be updated");
-            return;
-        }
+        if (subTask == null)
+            throw new IllegalArgumentException("Empty object can't be updated");
+
         if (subTasks.containsKey(id)) {
             int parent = subTasks.get(id).getParentEpic();
             subTasks.put(id, subTask);
@@ -341,22 +353,23 @@ class InMemoryTaskManager implements TaskManager {
             subTask.linkToEpic(parent);
             updateEpic(epics.get(parent));
             addToPriorityList(subTask);
-        } else
-            System.out.println("No such a sub task in tracking, unable to update");
+        } else {
+            throw new IllegalArgumentException("No such a sub task in tracking, unable to update");
+        }
     }
 
     @Override
-    public void updateEpic(Epic epic, int id) {
-        if (epic == null) {
-            System.out.println("Empty object can't be updated");
-            return;
-        }
+    public void updateEpic(Epic epic, int id) throws IllegalArgumentException {
+        if (epic == null)
+            throw new IllegalArgumentException("Empty object can't be updated");
+
         if (epics.containsKey(id)) {
             epics.put(id, epic);
             epic.setId(id);
             updateEpicDuration(epic);
-        } else
-            System.out.println("No such an epic in tracking, unable to update");
+        } else {
+            throw new IllegalArgumentException("No such an epic in tracking, unable to update");
+        }
     }
 
     private void updateEpic(Epic epic) {
@@ -383,11 +396,10 @@ class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public List<SubTask> getSubTasksOf(Epic epic) {
-        if (epic == null) {
-            System.out.println("This epic is empty");
-            return null;
-        }
+    public List<SubTask> getSubTasksOf(Epic epic) throws IllegalArgumentException {
+        if (epic == null)
+            throw new IllegalArgumentException("This epic is empty");
+
         if (epics.containsKey(epic.getId())) {
             ArrayList<SubTask> result = new ArrayList<>();
             List<Integer> idList = epic.getSubTasks();
@@ -395,8 +407,7 @@ class InMemoryTaskManager implements TaskManager {
                 result.add(subTasks.get(id));
             return result;
         } else {
-            System.out.println("No such an epic in tracking, invalid operation");
-            return null;
+            throw new IllegalArgumentException("No such an epic in tracking, invalid operation");
         }
     }
 
@@ -441,6 +452,15 @@ class InMemoryTaskManager implements TaskManager {
             return !t2StartTime.isAfter(t1EndTime);
         else
             return t2StartTime.isEqual(t1StartTime) || t2EndTime.isEqual(t1EndTime);
+    }
+
+    private boolean checkIdCollision(int id) { //true if colliding, false if not
+        List<Integer> idList = new ArrayList<>();
+        tasks.keySet().forEach(idList::add);
+        epics.keySet().forEach(idList::add);
+        subTasks.keySet().forEach(idList::add);
+
+        return idList.contains(id);
     }
 
     private void updateEpicDuration(Epic epic) {

@@ -1,12 +1,21 @@
+import kvserver.KVServer;
 import manager.Managers;
 import manager.TaskManager;
 import task.Epic;
 import task.SubTask;
 
+import java.io.IOException;
+
 public class Main {
 
     public static void main(String[] args) {
-        TaskManager tm = Managers.getFileBackedManager("TM.csv");
+        try {
+            new KVServer().start();
+        } catch (IOException e) {
+            System.out.println("CHTO-TO POSHLO NE TAK :(");
+        }
+
+        TaskManager tm = Managers.getDefault();
 
         Epic epic1 = new Epic("name1", "description1");
         Epic epic2 = new Epic("name2", "description2");
@@ -32,6 +41,5 @@ public class Main {
         tm.getEpic(1);
 
         System.out.println(tm.getHistory());
-
     }
 }

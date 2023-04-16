@@ -9,7 +9,6 @@ public class Task {
     public static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm");
     protected Duration duration;
     protected LocalDateTime startTime;
-    protected boolean hasId;
     protected Status status;
     protected String name;
     protected String description;
@@ -18,7 +17,6 @@ public class Task {
         this.name = name;
         this.description = description;
         status = Status.NEW;
-        hasId = false;
     }
 
     public void setDuration(LocalDateTime startTime, long durationInMinutes) throws IllegalArgumentException {
@@ -99,11 +97,10 @@ public class Task {
 
     public void setId(int id) {
         this.id = id;
-        hasId = true;
     }
 
     public boolean hasId() {
-        return hasId;
+        return id > 0;
     }
 
     public String getName() {

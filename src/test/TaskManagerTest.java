@@ -62,11 +62,15 @@ abstract class TaskManagerTest<T extends TaskManager> {
     }
 
     @Test
-    void shouldNotAddNullEpic() {
-        List<Epic> expected = manager.getEpics();
-
-        manager.addEpic(null);
-        assertEquals(expected, manager.getEpics());
+    void shouldThrowWhenAddNullEpic() {
+        String expected = "Empty object cannot be added";
+        IllegalArgumentException e = assertThrows(
+                IllegalArgumentException.class,
+                () -> {
+                    manager.addEpic(null);
+                }
+        );
+        assertEquals(expected, e.getMessage());
     }
 
     @Test
@@ -79,9 +83,15 @@ abstract class TaskManagerTest<T extends TaskManager> {
 
     @Test
     void shouldNotUpdateEpicWhenNull() {
-        manager.updateEpic(null, 3);
+        String expected = "Empty object can't be updated";
+        IllegalArgumentException e = assertThrows(
+                IllegalArgumentException.class,
+                () -> {
+                    manager.updateEpic(null, 3);
+                }
+        );
 
-        assertEquals(epic1, manager.getEpic(3));
+        assertEquals(expected, e.getMessage());
     }
 
     @Test
@@ -208,11 +218,15 @@ abstract class TaskManagerTest<T extends TaskManager> {
     }
 
     @Test
-    void shouldNotAddNullSub() {
-        List<SubTask> expected = manager.getSubTasks();
-
-        manager.addSubTask(null);
-        assertEquals(expected, manager.getSubTasks());
+    void shouldThrowExWhenAddNullSub() {
+        String expected = "Empty object cannot be added";
+        IllegalArgumentException e = assertThrows(
+                IllegalArgumentException.class,
+                () -> {
+                    manager.addSubTask(null);
+                }
+        );
+        assertEquals(expected, e.getMessage());
     }
 
     @Test
@@ -226,9 +240,15 @@ abstract class TaskManagerTest<T extends TaskManager> {
 
     @Test
     void shouldNotSubTaskUpdateWhenNull() {
-        manager.updateSubTask(null, 4);
+        String expected = "Empty object can't be updated";
+        IllegalArgumentException e = assertThrows(
+                IllegalArgumentException.class,
+                () -> {
+                    manager.updateSubTask(null, 4);
+                }
+        );
 
-        assertEquals(subTask1, manager.getSubTask(4));
+        assertEquals(expected, e.getMessage());
     }
 
     @Test
@@ -249,11 +269,17 @@ abstract class TaskManagerTest<T extends TaskManager> {
     }
 
     @Test
-    void shouldReturnNulWhenParentEpicIsRemoved() {
+    void shouldThrowExWhenParentEpicIsRemoved() {
+        String expected = "Sub task list is empty";
         manager.removeEpic(3);
-
-        assertNull(manager.getSubTask(4));
-        assertNull(manager.getSubTask(5));
+        IllegalArgumentException e = assertThrows(
+                IllegalArgumentException.class,
+                () -> {
+                    assertNull(manager.getSubTask(5));
+                }
+        );
+        System.out.println(e.getMessage());
+        assertEquals(expected, e.getMessage());
     }
 
     @Test
@@ -283,11 +309,15 @@ abstract class TaskManagerTest<T extends TaskManager> {
     }
 
     @Test
-    void shouldNotAddNullTask() {
-        List<Task> expected = manager.getTasks();
-
-        manager.addTask(null);
-        assertEquals(expected, manager.getTasks());
+    void shouldThrowExWhenAddNullTask() {
+        String expected = "Empty object cannot be added";
+        IllegalArgumentException e = assertThrows(
+                IllegalArgumentException.class,
+                () -> {
+                    manager.addTask(null);
+                }
+        );
+        assertEquals(expected, e.getMessage());
     }
 
     @Test
@@ -300,10 +330,15 @@ abstract class TaskManagerTest<T extends TaskManager> {
     }
 
     @Test
-    void shouldNotUpdateTaskWhenNull() {
-        manager.updateTask(null, 1);
-
-        assertEquals(task1, manager.getTask(1));
+    void shouldThrowExUpdateTaskWhenNull() {
+        String expected = "Empty object can't be updated";
+        IllegalArgumentException e = assertThrows(
+                IllegalArgumentException.class,
+                () -> {
+                    manager.updateTask(null, 1);
+                }
+        );
+        assertEquals(expected, e.getMessage());
     }
 
     @Test
@@ -631,7 +666,8 @@ abstract class TaskManagerTest<T extends TaskManager> {
         testSub2.setDuration(LocalDateTime.of(2000, 1, 1, 0, 5), 10L);
         try {
             manager.addSubTask(testSub2); //adding colliding task
-        } catch (IllegalArgumentException e) {}
+        } catch (IllegalArgumentException e) {
+        }
 
         assertTrue(manager.getPrioritizedTasks().contains(testSub1));
         assertFalse(manager.getPrioritizedTasks().contains(testSub2));

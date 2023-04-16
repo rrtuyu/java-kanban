@@ -1,5 +1,6 @@
 package task;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -70,11 +71,13 @@ public class Epic extends Task {
 
         if (localDeadLine.isAfter(this.endTime))
             this.endTime = localDeadLine;
+
+        duration = Duration.between(this.startTime, this.endTime);
     }
 
     @Override
     public LocalDateTime getStartTime() {
-        if (startTime.isEqual(LocalDateTime.MAX))
+        if (startTime != null && startTime.isEqual(LocalDateTime.MAX))
             return null;
 
         return startTime;
@@ -82,7 +85,7 @@ public class Epic extends Task {
 
     @Override
     public LocalDateTime getEndTime() {
-        if (endTime.isEqual(LocalDateTime.MIN))
+        if (endTime != null && endTime.isEqual(LocalDateTime.MIN))
             return null;
 
         return endTime;

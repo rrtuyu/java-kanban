@@ -15,6 +15,10 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
     private String file;
     private static final String HEADER = "id,type,name,status,description,start,end,epic";
 
+    protected FileBackedTaskManager() {
+        super();
+    }
+
     public FileBackedTaskManager(String file) {
         super();
         this.file = DIR + file;
@@ -29,7 +33,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
     }
 
     public static void main(String[] args) {
-        TaskManager tm = Managers.getDefault();
+        TaskManager tm = new FileBackedTaskManager("TM.csv");
 
         Task task1 = new Task("task1", "description1");
         task1.setDuration(LocalDateTime.of(2022, 12, 2, 0, 0), 60L);
@@ -178,7 +182,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         save();
     }
 
-    private void save() throws ManagerSaveException {
+    protected void save() throws ManagerSaveException {
         try {
             writeDown(tasksAsStringList());
         } catch (IOException e) {
@@ -189,6 +193,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
 
     private List<String> tasksAsStringList() {
         List<String> taskList = new ArrayList<>();
+
         for (Task task : tasks.values())
             taskList.add(toString(task));
 

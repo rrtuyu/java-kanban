@@ -325,6 +325,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
                 this.history.add(subTasks.get(item));
             }
         }
+        save();
     }
 
     public static FileBackedTaskManager loadFromFile(File file) {

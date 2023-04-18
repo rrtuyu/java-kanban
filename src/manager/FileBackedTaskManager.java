@@ -298,9 +298,9 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
                 Task task = new Task(name, description);
                 task.setStatus(status);
                 task.setId(taskId);
-                addTask(task);
                 if (start != null && duration != null)
                     task.setDuration(start, duration.toMinutes());
+                addTask(task);
                 return task;
         }
     }
@@ -338,7 +338,6 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
                 }
                 manager.fromString(elem);
             }
-            manager.save();
         } catch (IOException e) {
             throw new ManagerSaveException(e.getMessage());
         }

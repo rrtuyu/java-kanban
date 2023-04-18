@@ -11,7 +11,7 @@ public class KVTaskClient {
     private static final String SAVE_ENDPOINT = "/save/";
     private static final String LOAD_ENDPOINT = "/load/";
 
-    private String API_TOKEN;
+    private String api_token;
     private URI HOST;
     private HttpClient client;
     private HttpResponse.BodyHandler<String> rHandler;
@@ -20,11 +20,11 @@ public class KVTaskClient {
         this.client = HttpClient.newHttpClient();
         this.HOST = URI.create(url);
         this.rHandler = HttpResponse.BodyHandlers.ofString();
-        this.API_TOKEN = assignToken();
+        this.api_token = assignToken();
     }
 
     public void put(String key, String json) {
-        URI uri = HOST.resolve(SAVE_ENDPOINT + key + "?API_TOKEN=" + API_TOKEN);
+        URI uri = HOST.resolve(SAVE_ENDPOINT + key + "?API_TOKEN=" + api_token);
         HttpRequest.BodyPublisher publisher = HttpRequest.BodyPublishers.ofString(json);
 
         HttpRequest req = HttpRequest.newBuilder()
@@ -34,14 +34,16 @@ public class KVTaskClient {
 
         try {
             HttpResponse<String> resp = client.send(req, rHandler);
-            System.out.println("Put status code: " + resp.statusCode());
+            int statusCode = resp.statusCode();
+            if (statusCode != 200)
+                throw new IOException(String.format("Failed put an element\n%s: %s\nServer response code: %d", key, json, statusCode));
         } catch (IOException | InterruptedException e) {
-            throw new KVClientException(String.format("Couldn't put an element\n%s: %s", key, json));
+            throw new KVClientException(e.getMessage());
         }
     }
 
     public String load(String key) {
-        URI uri = HOST.resolve(LOAD_ENDPOINT + key + "?API_TOKEN=" + API_TOKEN);
+        URI uri = HOST.resolve(LOAD_ENDPOINT + key + "?API_TOKEN=" + api_token);
 
         HttpRequest req = HttpRequest.newBuilder()
                 .GET()

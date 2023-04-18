@@ -71,15 +71,12 @@ public class HttpTaskServer {
                 case GET_SUBTASKS:
                     handleGetTasksByType(exchange, "subtask");
                     break;
-
                 case GET_HISTORY:
                     handleGetHistory(exchange);
                     break;
                 case GET_PRIORITY:
                     handleGetPriority(exchange);
                     break;
-
-
                 case GET_TASK_ID:
                     try {
                         int id = Integer.parseInt(query.replace("id=", ""));
@@ -107,7 +104,6 @@ public class HttpTaskServer {
                         break;
                     }
                     break;
-
                 case GET_SUBTASKS_OF_EPIC:
                     try {
                         int id = Integer.parseInt(query.replace("id=", ""));
@@ -117,7 +113,6 @@ public class HttpTaskServer {
                         break;
                     }
                     break;
-
                 case POST_TASK:
                     handlePostTaskByType(exchange, "task");
                     break;
@@ -127,7 +122,6 @@ public class HttpTaskServer {
                 case POST_SUBTASK:
                     handlePostTaskByType(exchange, "subtask");
                     break;
-
                 case DELETE_TASKS:
                     handleDeleteTasksByType(exchange, "task");
                     break;
@@ -137,7 +131,6 @@ public class HttpTaskServer {
                 case DELETE_SUBTASKS:
                     handleDeleteTasksByType(exchange, "subtask");
                     break;
-
                 case DELETE_TASK:
                     try {
                         int id = Integer.parseInt(query.replace("id=", ""));
@@ -165,7 +158,6 @@ public class HttpTaskServer {
                         break;
                     }
                     break;
-
                 case UNKNOWN:
                     writeResponse(exchange, "Incorrect request", 400);
                     break;
@@ -250,19 +242,15 @@ public class HttpTaskServer {
         }
 
         private void handleGetTasksByType(HttpExchange exchange, String type) throws IOException {
-            String resp;
             switch (type) {
                 case "task":
-                    resp = gson.toJson(manager.getTasks());
-                    writeResponse(exchange, resp, 200);
+                    writeResponse(exchange, gson.toJson(manager.getTasks()), 200);
                     break;
                 case "epic":
-                    resp = gson.toJson(manager.getEpics());
-                    writeResponse(exchange, resp, 200);
+                    writeResponse(exchange, gson.toJson(manager.getEpics()), 200);
                     break;
                 case "subtask":
-                    resp = gson.toJson(manager.getSubTasks());
-                    writeResponse(exchange, resp, 200);
+                    writeResponse(exchange, gson.toJson(manager.getSubTasks()), 200);
                     break;
             }
         }

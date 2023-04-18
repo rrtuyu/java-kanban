@@ -7,4 +7,3 @@ id,type,name,status,description,start,end,epic
 5,SUBTASK,subtask2,NEW,description2,04.04.2023 12:16,04.04.2023 12:36,1
 7,SUBTASK,subtask3,NEW,description3,not set,not set,4
 
-3,1,2,4

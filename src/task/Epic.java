@@ -36,9 +36,9 @@ public class Epic extends Task {
                 ", status='" + status + '\'' +
                 ", name='" + name + '\'' +
                 ", description='" + description + '\'' +
-                ", subTasks.size=" + subTasks.size() +
                 ", start='" + start + '\'' +
                 ", end='" + end + '\'' +
+                ", subTasks.size=" + subTasks.size() +
                 '}';
     }
 

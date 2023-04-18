@@ -29,13 +29,13 @@ public class SubTask extends Task {
             end = startTime.plusMinutes(duration.toMinutes()).format(FORMATTER);
 
         return "SubTask{" +
-                "parentEpicId=" + parentEpicId +
-                ", id=" + id +
+                "id=" + id +
                 ", status='" + status + '\'' +
                 ", name='" + name + '\'' +
                 ", description='" + description + '\'' +
                 ", start='" + start + '\'' +
                 ", end='" + end + '\'' +
+                ", parentEpicId=" + parentEpicId +
                 '}';
     }
 

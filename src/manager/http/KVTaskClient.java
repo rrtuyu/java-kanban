@@ -11,20 +11,20 @@ public class KVTaskClient {
     private static final String SAVE_ENDPOINT = "/save/";
     private static final String LOAD_ENDPOINT = "/load/";
 
-    private String api_token;
-    private URI HOST;
+    private String apiToken;
+    private URI host;
     private HttpClient client;
     private HttpResponse.BodyHandler<String> rHandler;
 
     public KVTaskClient(String url) throws KVClientException {
         this.client = HttpClient.newHttpClient();
-        this.HOST = URI.create(url);
+        this.host = URI.create(url);
         this.rHandler = HttpResponse.BodyHandlers.ofString();
-        this.api_token = assignToken();
+        this.apiToken = assignToken();
     }
 
     public void put(String key, String json) {
-        URI uri = HOST.resolve(SAVE_ENDPOINT + key + "?API_TOKEN=" + api_token);
+        URI uri = host.resolve(SAVE_ENDPOINT + key + "?API_TOKEN=" + apiToken);
         HttpRequest.BodyPublisher publisher = HttpRequest.BodyPublishers.ofString(json);
 
         HttpRequest req = HttpRequest.newBuilder()
@@ -43,7 +43,7 @@ public class KVTaskClient {
     }
 
     public String load(String key) {
-        URI uri = HOST.resolve(LOAD_ENDPOINT + key + "?API_TOKEN=" + api_token);
+        URI uri = host.resolve(LOAD_ENDPOINT + key + "?API_TOKEN=" + apiToken);
 
         HttpRequest req = HttpRequest.newBuilder()
                 .GET()
@@ -61,7 +61,7 @@ public class KVTaskClient {
     }
 
     private String assignToken() throws KVClientException {
-        URI regUri = HOST.resolve(REG_ENDPOINT);
+        URI regUri = host.resolve(REG_ENDPOINT);
         HttpRequest req = HttpRequest.newBuilder()
                 .GET()
                 .uri(regUri)

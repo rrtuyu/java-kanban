@@ -3,23 +3,31 @@ package manager.http;
 import kvserver.KVServer;
 import manager.FileBackedTaskManager;
 import manager.ManagerSaveException;
+import manager.Managers;
+import manager.TaskManager;
+import task.*;
 
 import java.io.IOException;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
-
-import manager.Managers;
-import manager.TaskManager;
-import task.*;
 
 public class HttpTaskManager extends FileBackedTaskManager {
     private KVTaskClient kvTaskClient;
+    private boolean ready;
+
+    private HttpTaskManager(String url, boolean ready) {
+        super();
+        this.kvTaskClient = new KVTaskClient(url);
+        this.ready = ready;
+    }
 
     public HttpTaskManager(String url) {
         super();
         this.kvTaskClient = new KVTaskClient(url);
+        this.ready = true;
     }
 
     public static void main(String[] args) {
@@ -32,13 +40,21 @@ public class HttpTaskManager extends FileBackedTaskManager {
 
         Task t = new Task("test task", "test task");
         manager.addTask(t);
+        Task t2 = new Task("shrek test", "test task");
+        manager.addTask(t2);
 
         Epic e = new Epic("test epic", "test epic");
         manager.addEpic(e);
+        Epic e2 = new Epic("donkey epic", "test epic");
+        manager.addEpic(e2);
+
 
         SubTask s = new SubTask("test sub", "test sub");
         manager.addSubTask(s);
 
+        manager.removeTask(2);
+        manager.removeTask(1);
+        
         manager.linkSubToEpic(s, e);
 
         HttpTaskManager htm = HttpTaskManager.load("http://localhost:8078", "http://localhost:8078");
@@ -54,42 +70,62 @@ public class HttpTaskManager extends FileBackedTaskManager {
         System.out.println("\ninitial managers' history\n" + manager.getHistory());
         System.out.println("loaded managers' history\n" + htm.getHistory());
 
-        System.out.println(manager.equals(htm));
+        System.out.println("Managers are equal: " + manager.equals(htm));
     }
 
     @Override
     protected void save() throws ManagerSaveException {
-        for (Integer key : tasks.keySet())
-            kvTaskClient.put(key.toString(), tasks.get(key).toString());
+        if (ready) {
+            tasks.keySet().forEach(key -> kvTaskClient.put(key.toString(), tasks.get(key).toString()));
+            kvTaskClient.put("tasks", tasks.keySet().toString());
 
-        for (Integer key : epics.keySet())
-            kvTaskClient.put(key.toString(), epics.get(key).toString());
 
-        for (Integer key : subTasks.keySet())
-            kvTaskClient.put(key.toString(), subTasks.get(key).toString());
+            epics.keySet().forEach(key -> kvTaskClient.put(key.toString(), epics.get(key).toString()));
+            kvTaskClient.put("epics", epics.keySet().toString());
 
-        if (!history.getHistory().isEmpty())
-            kvTaskClient.put("history", historyToString(history));
+
+            subTasks.keySet().forEach(key -> kvTaskClient.put(key.toString(), subTasks.get(key).toString()));
+            kvTaskClient.put("subtasks", subTasks.keySet().toString());
+
+
+            if (!history.getHistory().isEmpty())
+                kvTaskClient.put("history", historyToString(history));
+        }
     }
 
     public static HttpTaskManager load(String srcUrl, String targetUrl) {
-        Integer id = 1;
-        HttpTaskManager newManager = new HttpTaskManager(targetUrl);
+        HttpTaskManager newManager = new HttpTaskManager(targetUrl, false);
         KVTaskClient client = new KVTaskClient(srcUrl);
-        while (true) {
-            try {
-                String value = client.load(id.toString());
-                newManager.fromString(value);
-            } catch (KVClientException e) {
-                break;
-            }
-            id++;
+        try {
+            String tasksStr = client.load("tasks").replaceAll("[\\[\\] ]", "");
+            List<String> tasks = Arrays.asList(tasksStr.split(","));
+            tasks.forEach(t -> newManager.fromString(client.load(t)));
+        } catch (KVClientException e) {
+            System.out.println(e.getMessage());
         }
+
+        try {
+            String epicsStr = client.load("epics").replaceAll("[\\[\\] ]", "");
+            List<String> epics = Arrays.asList(epicsStr.split(","));
+            epics.forEach(e -> newManager.fromString(client.load(e)));
+        } catch (KVClientException e) {
+            System.out.println(e.getMessage());
+        }
+
+        try {
+            String subStr = client.load("subtasks").replaceAll("[\\[\\] ]", "");
+            List<String> subs = Arrays.asList(subStr.split(","));
+            subs.forEach(s -> newManager.fromString(client.load(s)));
+        } catch (KVClientException e) {
+            System.out.println(e.getMessage());
+        }
+
         try {
             newManager.loadHistory(historyFromString(client.load("history")));
         } catch (KVClientException e) {
             System.out.println("Failed too load history");
         }
+        newManager.ready = true;
         return newManager;
     }
 
